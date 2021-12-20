@@ -1,35 +1,49 @@
+import { useState, useEffect, FC, useRef } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { MusicalNoteOutline } from 'react-ionicons';
-import { useState, useEffect, FC, useRef } from 'react';
 import axios from 'axios';
 import YoutubeSearchItem from '../models/youtubeSearchItem';
-import { string } from 'prop-types';
+import PlayList, {
+  pushSongRequest,
+  newPlayList,
+} from '../models/songRequest/PlayList';
+import PlayListRepository from '../services/firestore/playListRepository';
+import SongRequest, { newSongRequest } from '../models/songRequest/SongRequest';
+import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
+import { newUser } from '../models/user/User';
 
+const repo = new PlayListRepository('isling');
 interface VideoProps {
   thumbnailImage: string;
   title: string;
   channel: string;
+  addSongRequest: () => void;
 }
 
 const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
   return (
-    <div className="flex p-6 font-mono ">
-      <div className="flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full">
-        <img src={thumbnailImage} alt="" className="absolute z-10 inset-0 w-full object-cover rounded-lg" />
+    <div className='flex p-6 font-mono '>
+      <div className='flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full'>
+        <img
+          src={thumbnailImage}
+          alt=''
+          className='absolute z-10 inset-0 w-full object-cover rounded-lg'
+        />
       </div>
-      <form className="flex-auto pl-6">
-        <div className="relative flex flex-wrap items-baseline pb-6 ">
-          <h1 className="relative w-full flex-none mb-2 text-xl font-semibold text-white">
+      <form className='flex-auto pl-6'>
+        <div className='relative flex flex-wrap items-baseline pb-6 '>
+          <h1 className='relative w-full flex-none mb-2 text-xl font-semibold text-white'>
             {title}
           </h1>
-          <div className="relative text-sm text-white">
-            {channel}
-          </div>
+          <div className='relative text-sm text-white'>{channel}</div>
         </div>
-        <div className="flex space-x-2 mb-4 text-sm font-medium">
-          <div className="flex space-x-4">
-            <button className="px-6 h-12 uppercase font-semibold tracking-wider border border-gray-200 text-white hover:bg-[bisque] hover:text-black" type="button">
+        <div className='flex space-x-2 mb-4 text-sm font-medium'>
+          <div className='flex space-x-4'>
+            <button
+              className='px-6 h-12 uppercase font-semibold tracking-wider border border-gray-200 text-white hover:bg-[bisque] hover:text-black'
+              type='button'
+            >
               Add to list
             </button>
           </div>
@@ -39,17 +53,31 @@ const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
   );
 };
 
+const sampleSongRequest = newSongRequest(
+  newYoutubeSong('dQw4w9WgXcQ', 'Never Gonna Give You Up'),
+  newUser('isling', 'Isling')
+);
+
 const Home: NextPage = () => {
   const [keyword, setKeyword] = useState<string>('');
   const [items, setItems] = useState<YoutubeSearchItem[]>([]);
-  const timeout = useRef<any>(null)
+  const [playlist] = useState<PlayList>(newPlayList([], 0));
+  const timeout = useRef<any>(null);
   const handleChange = (value: string) => {
-    if(timeout.current != null) {
+    if (timeout.current != null) {
       clearTimeout(timeout.current);
     }
     timeout.current = setTimeout(function () {
       setKeyword(value);
     }, 500);
+  };
+  const addSongRequest = (youtubeSong: YoutubeSong) => async () => {
+    const songRequest = newSongRequest(
+      youtubeSong,
+      newUser('isling', 'Isling')
+    );
+    const newPlayList = pushSongRequest(playlist, songRequest);
+    await repo.setPlayList(newPlayList);
   };
 
   useEffect(() => {
@@ -63,11 +91,11 @@ const Home: NextPage = () => {
         order: 'relevance',
         q: keyword,
         type: 'video',
-        key: 'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY'
-      }
+        key: 'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY',
+      },
     }).then((response) => {
-      setItems(response.data.items)
-    })
+      setItems(response.data.items);
+    });
   }, [keyword]);
 
   return (
@@ -101,13 +129,21 @@ const Home: NextPage = () => {
           <div className='h-full overflow-y-auto absolute top-12'>
             <div className='space-y-4 overflow-y-auto'>
               <div className='h-14'></div>
-              { items.length > 0 &&
+              {items.length > 0 &&
                 items.map((value, index) => {
-                  const videoData = value.snippet
-                  return <Video key={index} title={videoData.title} channel={videoData.channelTitle} thumbnailImage={videoData.thumbnails.default.url} />
-                }
-                )
-              }
+                  const videoData = value.snippet;
+                  return (
+                    <Video
+                      key={index}
+                      title={videoData.title}
+                      channel={videoData.channelTitle}
+                      thumbnailImage={videoData.thumbnails.default.url}
+                      addSongRequest={addSongRequest(
+                        newYoutubeSong(value.id.videoId, videoData.title)
+                      )}
+                    />
+                  );
+                })}
             </div>
           </div>
         </div>
