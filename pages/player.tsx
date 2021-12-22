@@ -1,8 +1,12 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Youtube, { Options } from 'react-youtube';
 import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
+import PlaylistRepository from '../services/firestore/PlaylistRepository';
+import Playlist, { newPlaylist } from '../models/songRequest/Playlist';
+
+const repo = new PlaylistRepository('isling');
 
 const youtubeOpts: Options = {
   playerVars: {
@@ -10,11 +14,20 @@ const youtubeOpts: Options = {
   },
 };
 
-const defaultSong = newYoutubeSong('dQw4w9WgXcQ', 'Never Gonna Give You Up');
+const defaultSong = newYoutubeSong(
+  'dQw4w9WgXcQ',
+  'Never Gonna Give You Up',
+  'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'
+);
 
 const Player: NextPage = () => {
   const player = useRef<any>();
+  const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
+  const [songIndex, setSongIndex] = useState<number>(0);
   const [song, setSong] = useState<YoutubeSong>(defaultSong);
+  const currentRequestId = useRef<string>('');
+  const prevPlaylistLength = useRef<number>(0);
+  const shadowSongIndex = useRef<number>(0);
 
   const onReady = (event: { target: any }) => {
     console.log('player: onReady');
@@ -22,7 +35,28 @@ const Player: NextPage = () => {
   };
   const handlePlay = () => {};
   const handlePause = () => {};
-  const handleStageChange = () => {};
+  const handleStageChange = (event: { data: number }) => {
+    console.log('player: handleStageChange', event);
+
+    if (event.data === Youtube.PlayerState.ENDED) {
+      setSongIndex(songIndex + 1);
+    }
+  };
+
+  useEffect(() => {
+    if (playlist.list.length === 0) {
+      return;
+    }
+    const request = playlist.list[songIndex % playlist.list.length];
+
+    // in case playlist changed but current songRequest is not changed
+    if (request.id === currentRequestId.current) {
+      return;
+    }
+
+    setSong(request.song);
+    currentRequestId.current = request.id;
+  }, [playlist, songIndex]);
 
   useEffect(() => {
     console.log('player: change song:', song);
@@ -32,6 +66,41 @@ const Player: NextPage = () => {
 
     player.current.seekTo(0, true);
   }, [song]);
+
+  useEffect(() => {
+    console.log('player: change songIndex:', songIndex);
+    shadowSongIndex.current = songIndex;
+  }, [songIndex]);
+
+  useEffect(() => {
+    const unsub = repo.onSnapshotPlaylist((playlist) => {
+      console.log('player: playlist changed:', playlist);
+      if (!playlist) return;
+
+      setPlaylist(playlist);
+
+      if (
+        shadowSongIndex.current >= prevPlaylistLength.current && // all songs are played
+        playlist.list.length > prevPlaylistLength.current // playlist added
+      ) {
+        // then play new song
+        setSongIndex(prevPlaylistLength.current);
+      }
+
+      prevPlaylistLength.current = playlist.list.length;
+    });
+
+    window.onbeforeunload = async () => {
+      await repo.removePlaylist();
+    };
+
+    return () => {
+      window.onbeforeunload = null;
+      currentRequestId.current = '';
+      repo.removePlaylist();
+      unsub();
+    };
+  }, []);
 
   return (
     <div>

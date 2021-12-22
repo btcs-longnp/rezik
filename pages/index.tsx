@@ -105,7 +105,10 @@ const Home: NextPage = () => {
   useEffect(() => {
     const unsub = repo.onSnapshotPlaylist((playlist) => {
       console.log('playlist', playlist);
-      if (!playlist) return;
+      if (!playlist) {
+        setPlaylist(newPlaylist([], 0));
+        return;
+      }
 
       setPlaylist(playlist);
     });
