@@ -16,4 +16,4 @@ interface YoutubeSearchItem {
   };
 }
 
-export default YoutubeSearchItem
+export default YoutubeSearchItem;

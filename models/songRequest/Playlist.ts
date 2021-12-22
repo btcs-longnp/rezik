@@ -1,11 +1,11 @@
 import SongRequest from './SongRequest';
 
-interface PlayList {
+interface Playlist {
   list: SongRequest[];
   version: number;
 }
 
-export const newPlayList = (list: SongRequest[], version: number): PlayList => {
+export const newPlaylist = (list: SongRequest[], version: number): Playlist => {
   return {
     list,
     version,
@@ -13,20 +13,20 @@ export const newPlayList = (list: SongRequest[], version: number): PlayList => {
 };
 
 export const pushSongRequest = (
-  playlist: PlayList,
+  playlist: Playlist,
   songRequest: SongRequest
-): PlayList => {
+): Playlist => {
   return {
     ...playlist,
     list: [...playlist.list, songRequest],
   };
 };
 
-export const commitPlayList = (playlist: PlayList): PlayList => {
+export const commitPlaylist = (playlist: Playlist): Playlist => {
   return {
     ...playlist,
     version: playlist.version + 1,
   };
 };
 
-export default PlayList;
+export default Playlist;

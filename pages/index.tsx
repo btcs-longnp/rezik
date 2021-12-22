@@ -1,19 +1,20 @@
 import { useState, useEffect, FC, useRef } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Image from 'next/image';
 import { MusicalNoteOutline } from 'react-ionicons';
 import axios from 'axios';
-import YoutubeSearchItem from '../models/youtubeSearchItem';
-import PlayList, {
+import YoutubeSearchItem from '../models/YoutubeSearchItem';
+import Playlist, {
   pushSongRequest,
-  newPlayList,
-} from '../models/songRequest/PlayList';
-import PlayListRepository from '../services/firestore/playListRepository';
-import SongRequest, { newSongRequest } from '../models/songRequest/SongRequest';
+  newPlaylist,
+} from '../models/songRequest/Playlist';
+import PlaylistRepository from '../services/firestore/PlaylistRepository';
+import { newSongRequest } from '../models/songRequest/SongRequest';
 import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
 import { newUser } from '../models/user/User';
 
-const repo = new PlayListRepository('isling');
+const repo = new PlaylistRepository('isling');
 interface VideoProps {
   thumbnailImage: string;
   title: string;
@@ -21,14 +22,20 @@ interface VideoProps {
   addSongRequest: () => void;
 }
 
-const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
+const VideoCard: FC<VideoProps> = ({
+  thumbnailImage,
+  title,
+  channel,
+  addSongRequest,
+}) => {
   return (
     <div className='flex p-6 font-mono '>
       <div className='flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full'>
-        <img
+        <Image
           src={thumbnailImage}
-          alt=''
+          alt={title}
           className='absolute z-10 inset-0 w-full object-cover rounded-lg'
+          layout='fill'
         />
       </div>
       <form className='flex-auto pl-6'>
@@ -43,6 +50,7 @@ const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
             <button
               className='px-6 h-12 uppercase font-semibold tracking-wider border border-gray-200 text-white hover:bg-[bisque] hover:text-black'
               type='button'
+              onClick={addSongRequest}
             >
               Add to list
             </button>
@@ -53,16 +61,12 @@ const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
   );
 };
 
-const sampleSongRequest = newSongRequest(
-  newYoutubeSong('dQw4w9WgXcQ', 'Never Gonna Give You Up'),
-  newUser('isling', 'Isling')
-);
-
 const Home: NextPage = () => {
   const [keyword, setKeyword] = useState<string>('');
   const [items, setItems] = useState<YoutubeSearchItem[]>([]);
-  const [playlist] = useState<PlayList>(newPlayList([], 0));
+  const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
   const timeout = useRef<any>(null);
+
   const handleChange = (value: string) => {
     if (timeout.current != null) {
       clearTimeout(timeout.current);
@@ -76,8 +80,8 @@ const Home: NextPage = () => {
       youtubeSong,
       newUser('isling', 'Isling')
     );
-    const newPlayList = pushSongRequest(playlist, songRequest);
-    await repo.setPlayList(newPlayList);
+    const newPlaylist = pushSongRequest(playlist, songRequest);
+    await repo.setPlaylist(newPlaylist);
   };
 
   useEffect(() => {
@@ -97,6 +101,17 @@ const Home: NextPage = () => {
       setItems(response.data.items);
     });
   }, [keyword]);
+
+  useEffect(() => {
+    const unsub = repo.onSnapshotPlaylist((playlist) => {
+      console.log('playlist', playlist);
+      if (!playlist) return;
+
+      setPlaylist(playlist);
+    });
+
+    return unsub;
+  }, []);
 
   return (
     <div>
@@ -122,7 +137,7 @@ const Home: NextPage = () => {
                 type='text'
                 className='rounded-md h-full px-10 w-full focus:outline-none bg-slate-50'
                 onChange={(event) => handleChange(event.target.value)}
-                autoFocus-
+                autoFocus
               />
             </div>
           </div>
@@ -130,11 +145,11 @@ const Home: NextPage = () => {
             <div className='space-y-4 overflow-y-auto'>
               <div className='h-14'></div>
               {items.length > 0 &&
-                items.map((value, index) => {
+                items.map((value) => {
                   const videoData = value.snippet;
                   return (
-                    <Video
-                      key={index}
+                    <VideoCard
+                      key={value.id.videoId}
                       title={videoData.title}
                       channel={videoData.channelTitle}
                       thumbnailImage={videoData.thumbnails.default.url}
