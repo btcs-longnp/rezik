@@ -152,9 +152,13 @@ const Home: NextPage = () => {
                       key={value.id.videoId}
                       title={videoData.title}
                       channel={videoData.channelTitle}
-                      thumbnailImage={videoData.thumbnails.default.url}
+                      thumbnailImage={videoData.thumbnails.high.url}
                       addSongRequest={addSongRequest(
-                        newYoutubeSong(value.id.videoId, videoData.title)
+                        newYoutubeSong(
+                          value.id.videoId,
+                          videoData.title,
+                          videoData.thumbnails.high.url
+                        )
                       )}
                     />
                   );

@@ -1,22 +1,19 @@
 interface YoutubeSong {
   id: string;
   title: string;
-  thumbnail?: string;
+  thumbnail: string;
 }
 
 export const newYoutubeSong = (
   id: string,
   title: string,
-  thumbnail?: string
+  thumbnail: string
 ): YoutubeSong => {
   let song: YoutubeSong = {
     id,
     title,
+    thumbnail,
   };
-
-  if (thumbnail) {
-    song.thumbnail = thumbnail;
-  }
 
   return song;
 };
