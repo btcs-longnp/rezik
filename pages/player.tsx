@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Youtube, { Options } from 'react-youtube';
-import YoutubeSong from '../models/song/YoutubeSong';
+import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
 
 const youtubeOpts: Options = {
   playerVars: {
@@ -10,7 +10,7 @@ const youtubeOpts: Options = {
   },
 };
 
-const defaultSong = new YoutubeSong('dQw4w9WgXcQ', 'Never Gonna Give You Up');
+const defaultSong = newYoutubeSong('dQw4w9WgXcQ', 'Never Gonna Give You Up');
 
 const Player: NextPage = () => {
   const player = useRef<any>();

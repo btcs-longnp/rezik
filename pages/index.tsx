@@ -1,35 +1,57 @@
+import { useState, useEffect, FC, useRef } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Image from 'next/image';
 import { MusicalNoteOutline } from 'react-ionicons';
-import { useState, useEffect, FC, useRef } from 'react';
 import axios from 'axios';
-import YoutubeSearchItem from '../models/youtubeSearchItem';
-import { string } from 'prop-types';
+import YoutubeSearchItem from '../models/YoutubeSearchItem';
+import Playlist, {
+  pushSongRequest,
+  newPlaylist,
+} from '../models/songRequest/Playlist';
+import PlaylistRepository from '../services/firestore/PlaylistRepository';
+import { newSongRequest } from '../models/songRequest/SongRequest';
+import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
+import { newUser } from '../models/user/User';
 
+const repo = new PlaylistRepository('isling');
 interface VideoProps {
   thumbnailImage: string;
   title: string;
   channel: string;
+  addSongRequest: () => void;
 }
 
-const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
+const VideoCard: FC<VideoProps> = ({
+  thumbnailImage,
+  title,
+  channel,
+  addSongRequest,
+}) => {
   return (
-    <div className="flex p-6 font-mono ">
-      <div className="flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full">
-        <img src={thumbnailImage} alt="" className="absolute z-10 inset-0 w-full object-cover rounded-lg" />
+    <div className='flex p-6 font-mono '>
+      <div className='flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full'>
+        <Image
+          src={thumbnailImage}
+          alt={title}
+          className='absolute z-10 inset-0 w-full object-cover rounded-lg'
+          layout='fill'
+        />
       </div>
-      <form className="flex-auto pl-6">
-        <div className="relative flex flex-wrap items-baseline pb-6 ">
-          <h1 className="relative w-full flex-none mb-2 text-xl font-semibold text-white">
+      <form className='flex-auto pl-6'>
+        <div className='relative flex flex-wrap items-baseline pb-6 '>
+          <h1 className='relative w-full flex-none mb-2 text-xl font-semibold text-white'>
             {title}
           </h1>
-          <div className="relative text-sm text-white">
-            {channel}
-          </div>
+          <div className='relative text-sm text-white'>{channel}</div>
         </div>
-        <div className="flex space-x-2 mb-4 text-sm font-medium">
-          <div className="flex space-x-4">
-            <button className="px-6 h-12 uppercase font-semibold tracking-wider border border-gray-200 text-white hover:bg-[bisque] hover:text-black" type="button">
+        <div className='flex space-x-2 mb-4 text-sm font-medium'>
+          <div className='flex space-x-4'>
+            <button
+              className='px-6 h-12 uppercase font-semibold tracking-wider border border-gray-200 text-white hover:bg-[bisque] hover:text-black'
+              type='button'
+              onClick={addSongRequest}
+            >
               Add to list
             </button>
           </div>
@@ -42,14 +64,24 @@ const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
 const Home: NextPage = () => {
   const [keyword, setKeyword] = useState<string>('');
   const [items, setItems] = useState<YoutubeSearchItem[]>([]);
-  const timeout = useRef<any>(null)
+  const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
+  const timeout = useRef<any>(null);
+
   const handleChange = (value: string) => {
-    if(timeout.current != null) {
+    if (timeout.current != null) {
       clearTimeout(timeout.current);
     }
     timeout.current = setTimeout(function () {
       setKeyword(value);
     }, 500);
+  };
+  const addSongRequest = (youtubeSong: YoutubeSong) => async () => {
+    const songRequest = newSongRequest(
+      youtubeSong,
+      newUser('isling', 'Isling')
+    );
+    const newPlaylist = pushSongRequest(playlist, songRequest);
+    await repo.setPlaylist(newPlaylist);
   };
 
   useEffect(() => {
@@ -63,12 +95,23 @@ const Home: NextPage = () => {
         order: 'relevance',
         q: keyword,
         type: 'video',
-        key: 'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY'
-      }
+        key: 'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY',
+      },
     }).then((response) => {
-      setItems(response.data.items)
-    })
+      setItems(response.data.items);
+    });
   }, [keyword]);
+
+  useEffect(() => {
+    const unsub = repo.onSnapshotPlaylist((playlist) => {
+      console.log('playlist', playlist);
+      if (!playlist) return;
+
+      setPlaylist(playlist);
+    });
+
+    return unsub;
+  }, []);
 
   return (
     <div>
@@ -94,20 +137,32 @@ const Home: NextPage = () => {
                 type='text'
                 className='rounded-md h-full px-10 w-full focus:outline-none bg-slate-50'
                 onChange={(event) => handleChange(event.target.value)}
-                autoFocus-
+                autoFocus
               />
             </div>
           </div>
           <div className='h-full overflow-y-auto absolute top-12'>
             <div className='space-y-4 overflow-y-auto'>
               <div className='h-14'></div>
-              { items.length > 0 &&
-                items.map((value, index) => {
-                  const videoData = value.snippet
-                  return <Video key={index} title={videoData.title} channel={videoData.channelTitle} thumbnailImage={videoData.thumbnails.default.url} />
-                }
-                )
-              }
+              {items.length > 0 &&
+                items.map((value) => {
+                  const videoData = value.snippet;
+                  return (
+                    <VideoCard
+                      key={value.id.videoId}
+                      title={videoData.title}
+                      channel={videoData.channelTitle}
+                      thumbnailImage={videoData.thumbnails.high.url}
+                      addSongRequest={addSongRequest(
+                        newYoutubeSong(
+                          value.id.videoId,
+                          videoData.title,
+                          videoData.thumbnails.high.url
+                        )
+                      )}
+                    />
+                  );
+                })}
             </div>
           </div>
         </div>

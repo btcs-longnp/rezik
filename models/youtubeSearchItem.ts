@@ -7,7 +7,7 @@ interface YoutubeSearchItem {
     title: string;
     channelTitle: string;
     thumbnails: {
-      default: {
+      high: {
         url: string;
         width: number;
         height: number;
@@ -16,4 +16,4 @@ interface YoutubeSearchItem {
   };
 }
 
-export default YoutubeSearchItem
+export default YoutubeSearchItem;
