@@ -1,40 +1,18 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { MusicalNoteOutline } from 'react-ionicons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FC, useRef } from 'react';
 import axios from 'axios';
-import { string, number } from 'prop-types';
+import YoutubeSearchItem from '../models/youtubeSearchItem';
+import { string } from 'prop-types';
 
-type Item = {
-  id: {
-    kind: string,
-    videoId: string,
-  },
-  snippet: {
-    title: string,
-    description: string,
-    channelTitle: string,
-    thumbnails: {
-      default: {
-        url: string,
-        width: number,
-        height: number,
-      },
-    },
-  },
-};
-
-const Video = ({
-  thumbnailImage,
-  title,
-  description,
-  channel,
-}: {
+interface VideoProps {
   thumbnailImage: string;
   title: string;
-  description: string;
   channel: string;
-}) => {
+}
+
+const Video: FC<VideoProps> = ({ thumbnailImage, title, channel }) => {
   return (
     <div className="flex p-6 font-mono ">
       <div className="flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full">
@@ -63,13 +41,13 @@ const Video = ({
 
 const Home: NextPage = () => {
   const [keyword, setKeyword] = useState<string>('');
-  const [items, setItems] = useState<Item[]>([]);
-  let timeout: any = null;
+  const [items, setItems] = useState<YoutubeSearchItem[]>([]);
+  const timeout = useRef<any>(null)
   const handleChange = (value: string) => {
-    if(timeout != null) {
-      clearTimeout(timeout);
+    if(timeout.current != null) {
+      clearTimeout(timeout.current);
     }
-    timeout = setTimeout(function () {
+    timeout.current = setTimeout(function () {
       setKeyword(value);
     }, 500);
   };
@@ -126,7 +104,7 @@ const Home: NextPage = () => {
               { items.length > 0 &&
                 items.map((value, index) => {
                   const videoData = value.snippet
-                  return <Video key={index} title={videoData.title} description={videoData.description} channel={videoData.channelTitle} thumbnailImage={videoData.thumbnails.default.url} />
+                  return <Video key={index} title={videoData.title} channel={videoData.channelTitle} thumbnailImage={videoData.thumbnails.default.url} />
                 }
                 )
               }
