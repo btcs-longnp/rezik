@@ -92,6 +92,8 @@ const Player: NextPage = () => {
 
     window.onbeforeunload = async () => {
       await repo.removePlaylist();
+      window.onbeforeunload = null;
+      window.close();
     };
 
     return () => {
