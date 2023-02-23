@@ -5,6 +5,7 @@ import Youtube, { Options } from 'react-youtube';
 import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
 import PlaylistRepository from '../services/firestore/PlaylistRepository';
 import Playlist, { newPlaylist } from '../models/songRequest/Playlist';
+import MusicController from '../components/MusicController';
 
 const repo = new PlaylistRepository('isling');
 
@@ -33,8 +34,6 @@ const Player: NextPage = () => {
     console.log('player: onReady');
     player.current = event.target;
   };
-  const handlePlay = () => {};
-  const handlePause = () => {};
   const handleStageChange = (event: { data: number }) => {
     console.log('player: handleStageChange', event);
 
@@ -42,6 +41,21 @@ const Player: NextPage = () => {
       setSongIndex(songIndex + 1);
     }
   };
+  const next = () => {
+    setSongIndex(songIndex + 1);
+  }
+  const previous = () => {
+    if (songIndex === 0) {
+      return;
+    }
+
+    setSongIndex(songIndex - 1);
+  }
+  const play = () => {};
+  const pause = () => {};
+  const clearPlaylist = () => {
+    repo.removePlaylist()
+  }
 
   useEffect(() => {
     if (playlist.list.length === 0) {
@@ -113,6 +127,15 @@ const Player: NextPage = () => {
       </Head>
 
       <main>
+        <div className="fixed bottom-16 left-1/2 -translate-x-1/2">
+          <MusicController
+            play={play}
+            pause={pause}
+            next={next}
+            previous={previous}
+            clearPlaylist={clearPlaylist}
+          />
+        </div>
         <Youtube
           containerClassName='h-screen w-auto'
           className='h-full w-full'
@@ -120,8 +143,6 @@ const Player: NextPage = () => {
           opts={youtubeOpts}
           onReady={onReady}
           onStateChange={handleStageChange}
-          onPlay={handlePlay}
-          onPause={handlePause}
         />
       </main>
     </div>
