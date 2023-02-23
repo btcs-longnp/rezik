@@ -43,19 +43,21 @@ const Player: NextPage = () => {
   };
   const next = () => {
     setSongIndex(songIndex + 1);
-  }
+  };
   const previous = () => {
     if (songIndex === 0) {
       return;
     }
 
     setSongIndex(songIndex - 1);
-  }
+  };
   const play = () => {};
   const pause = () => {};
-  const clearPlaylist = () => {
-    repo.removePlaylist()
-  }
+  const clearPlaylist = async () => {
+    await repo.removePlaylist();
+    setPlaylist(newPlaylist([], 0));
+    alert('Clear playlist successfully');
+  };
 
   useEffect(() => {
     if (playlist.list.length === 0) {
@@ -104,16 +106,8 @@ const Player: NextPage = () => {
       prevPlaylistLength.current = playlist.list.length;
     });
 
-    window.onbeforeunload = async () => {
-      await repo.removePlaylist();
-      window.onbeforeunload = null;
-      window.close();
-    };
-
     return () => {
-      window.onbeforeunload = null;
       currentRequestId.current = '';
-      repo.removePlaylist();
       unsub();
     };
   }, []);
@@ -127,7 +121,7 @@ const Player: NextPage = () => {
       </Head>
 
       <main>
-        <div className="fixed bottom-16 left-1/2 -translate-x-1/2">
+        <div className='fixed bottom-16 left-1/2 -translate-x-1/2'>
           <MusicController
             play={play}
             pause={pause}
