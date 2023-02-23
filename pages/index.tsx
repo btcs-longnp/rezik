@@ -1,119 +1,115 @@
-import { useState, useEffect, FC, useRef } from 'react';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
-import { MusicalNoteOutline } from 'react-ionicons';
-import axios from 'axios';
-import YoutubeSearchItem from '../models/YoutubeSearchItem';
-import Playlist, {
-  pushSongRequest,
-  newPlaylist,
-} from '../models/songRequest/Playlist';
-import PlaylistRepository from '../services/firestore/PlaylistRepository';
-import { newSongRequest } from '../models/songRequest/SongRequest';
+import Youtube, { Options } from 'react-youtube';
 import YoutubeSong, { newYoutubeSong } from '../models/song/YoutubeSong';
-import { newUser } from '../models/user/User';
+import PlaylistRepository from '../services/firestore/PlaylistRepository';
+import Playlist, { newPlaylist } from '../models/songRequest/Playlist';
+import MusicController from '../components/MusicController';
 
 const repo = new PlaylistRepository('isling');
-interface VideoProps {
-  thumbnailImage: string;
-  title: string;
-  channel: string;
-  addSongRequest: () => void;
-}
 
-const VideoCard: FC<VideoProps> = ({
-  thumbnailImage,
-  title,
-  channel,
-  addSongRequest,
-}) => {
-  return (
-    <div className='flex p-6 font-mono '>
-      <div className='flex-none w-48 mb-10 relative z-10 before:absolute before:top-1 before:left-1 before:w-full before:h-full'>
-        <Image
-          src={thumbnailImage}
-          alt={title}
-          className='absolute z-10 inset-0 w-full object-cover rounded-lg'
-          layout='fill'
-        />
-      </div>
-      <form className='flex-auto pl-6'>
-        <div className='relative flex flex-wrap items-baseline pb-6 '>
-          <h1 className='relative w-full flex-none mb-2 text-xl font-semibold text-white'>
-            {title}
-          </h1>
-          <div className='relative text-sm text-white'>{channel}</div>
-        </div>
-        <div className='flex space-x-2 mb-4 text-sm font-medium'>
-          <div className='flex space-x-4'>
-            <button
-              className='px-6 h-12 uppercase font-semibold tracking-wider border border-gray-200 text-white hover:bg-[bisque] hover:text-black'
-              type='button'
-              onClick={addSongRequest}
-            >
-              Add to list
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
-  );
+const youtubeOpts: Options = {
+  playerVars: {
+    autoplay: 1,
+  },
 };
 
-const Home: NextPage = () => {
-  const [keyword, setKeyword] = useState<string>('');
-  const [items, setItems] = useState<YoutubeSearchItem[]>([]);
-  const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
-  const timeout = useRef<any>(null);
+const defaultSong = newYoutubeSong(
+  'dQw4w9WgXcQ',
+  'Never Gonna Give You Up',
+  'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg'
+);
 
-  const handleChange = (value: string) => {
-    if (timeout.current != null) {
-      clearTimeout(timeout.current);
-    }
-    timeout.current = setTimeout(function () {
-      setKeyword(value);
-    }, 500);
+const Player: NextPage = () => {
+  const player = useRef<any>();
+  const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
+  const [songIndex, setSongIndex] = useState<number>(0);
+  const [song, setSong] = useState<YoutubeSong>(defaultSong);
+  const currentRequestId = useRef<string>('');
+  const prevPlaylistLength = useRef<number>(0);
+  const shadowSongIndex = useRef<number>(0);
+
+  const onReady = (event: { target: any }) => {
+    console.log('player: onReady');
+    player.current = event.target;
   };
-  const addSongRequest = (youtubeSong: YoutubeSong) => async () => {
-    const songRequest = newSongRequest(
-      youtubeSong,
-      newUser('isling', 'Isling')
-    );
-    const newPlaylist = pushSongRequest(playlist, songRequest);
-    await repo.setPlaylist(newPlaylist);
+  const handleStageChange = (event: { data: number }) => {
+    console.log('player: handleStageChange', event);
+
+    if (event.data === Youtube.PlayerState.ENDED) {
+      setSongIndex(songIndex + 1);
+    }
+  };
+  const next = () => {
+    setSongIndex(songIndex + 1);
+  };
+  const previous = () => {
+    if (songIndex === 0) {
+      return;
+    }
+
+    setSongIndex(songIndex - 1);
+  };
+  const play = () => {};
+  const pause = () => {};
+  const clearPlaylist = async () => {
+    await repo.removePlaylist();
+    setPlaylist(newPlaylist([], 0));
+    alert('Clear playlist successfully');
   };
 
   useEffect(() => {
-    if (keyword == '') return;
-    axios({
-      method: 'GET',
-      url: 'https://www.googleapis.com/youtube/v3/search',
-      params: {
-        part: 'snippet',
-        maxResults: 8,
-        order: 'relevance',
-        q: keyword,
-        type: 'video',
-        key: 'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY',
-      },
-    }).then((response) => {
-      setItems(response.data.items);
-    });
-  }, [keyword]);
+    if (playlist.list.length === 0) {
+      return;
+    }
+    const request = playlist.list[songIndex % playlist.list.length];
+
+    // in case playlist changed but current songRequest is not changed
+    if (request.id === currentRequestId.current) {
+      return;
+    }
+
+    setSong(request.song);
+    currentRequestId.current = request.id;
+  }, [playlist, songIndex]);
+
+  useEffect(() => {
+    console.log('player: change song:', song);
+    if (!player.current) {
+      return;
+    }
+
+    player.current.seekTo(0, true);
+  }, [song]);
+
+  useEffect(() => {
+    console.log('player: change songIndex:', songIndex);
+    shadowSongIndex.current = songIndex;
+  }, [songIndex]);
 
   useEffect(() => {
     const unsub = repo.onSnapshotPlaylist((playlist) => {
-      console.log('playlist', playlist);
-      if (!playlist) {
-        setPlaylist(newPlaylist([], 0));
-        return;
-      }
+      console.log('player: playlist changed:', playlist);
+      if (!playlist) return;
 
       setPlaylist(playlist);
+
+      if (
+        shadowSongIndex.current >= prevPlaylistLength.current && // all songs are played
+        playlist.list.length > prevPlaylistLength.current // playlist added
+      ) {
+        // then play new song
+        setSongIndex(prevPlaylistLength.current);
+      }
+
+      prevPlaylistLength.current = playlist.list.length;
     });
 
-    return unsub;
+    return () => {
+      currentRequestId.current = '';
+      unsub();
+    };
   }, []);
 
   return (
@@ -124,54 +120,27 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <main className='w-screen h-screen bg-gray-800 text-gray-800 py-16'>
-        <div className='w-1/3 h-full mx-auto relative rounded-b-md overflow-hidden'>
-          <div className='absolute top-0 left-0 h-12 w-full bg-slate-800'>
-            <div className='relative h-full'>
-              <div className='absolute top-full w-full left-0 h-6 bg-gradient-to-b from-gray-800  to-transparent'></div>
-              <div className='absolute top-1/2 left-3 -translate-y-1/2 transform text-gray-500'>
-                <MusicalNoteOutline
-                  height='22px'
-                  width='22px'
-                  color='#bec7d5'
-                />
-              </div>
-              <input
-                type='text'
-                className='rounded-md h-full px-10 w-full focus:outline-none bg-slate-50'
-                onChange={(event) => handleChange(event.target.value)}
-                autoFocus
-              />
-            </div>
-          </div>
-          <div className='h-full overflow-y-auto absolute top-12'>
-            <div className='space-y-4 overflow-y-auto'>
-              <div className='h-14'></div>
-              {items.length > 0 &&
-                items.map((value) => {
-                  const videoData = value.snippet;
-                  return (
-                    <VideoCard
-                      key={value.id.videoId}
-                      title={videoData.title}
-                      channel={videoData.channelTitle}
-                      thumbnailImage={videoData.thumbnails.high.url}
-                      addSongRequest={addSongRequest(
-                        newYoutubeSong(
-                          value.id.videoId,
-                          videoData.title,
-                          videoData.thumbnails.high.url
-                        )
-                      )}
-                    />
-                  );
-                })}
-            </div>
-          </div>
+      <main>
+        <div className='fixed bottom-16 left-1/2 -translate-x-1/2'>
+          <MusicController
+            play={play}
+            pause={pause}
+            next={next}
+            previous={previous}
+            clearPlaylist={clearPlaylist}
+          />
         </div>
+        <Youtube
+          containerClassName='h-screen w-auto'
+          className='h-full w-full'
+          videoId={song.id}
+          opts={youtubeOpts}
+          onReady={onReady}
+          onStateChange={handleStageChange}
+        />
       </main>
     </div>
   );
 };
 
-export default Home;
+export default Player;
