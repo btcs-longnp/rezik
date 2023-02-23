@@ -28,7 +28,7 @@ const MusicController: FC<MusicControllerProps> = (props) => {
   return (
     <div className='flex justify-around items-center rounded-full px-3 py-2 bg-opacity-40 bg-gray-300 gap-x-16'>
       <ControllerButton onClick={props.previous}>{'<<'}</ControllerButton>
-      <ControllerButton onClick={props.play}>{'||'}</ControllerButton>
+      {/* <ControllerButton onClick={props.play}>{'||'}</ControllerButton> */}
       <ControllerButton onClick={props.next}>{'>>'}</ControllerButton>
       <ControllerButton onClick={props.clearPlaylist}>x</ControllerButton>
     </div>
