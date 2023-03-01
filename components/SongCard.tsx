@@ -45,10 +45,10 @@ const SongCard: FC<SongCardProps> = ({
         <div className='hidden group-hover:block h-full'>
           <div className='flex items-center space-x-2 h-full'>
             <IconButton onClick={play}>
-              <IoPlay size={22} />
+              <IoPlay />
             </IconButton>
             <IconButton onClick={remove}>
-              <IoTrash size={22} />
+              <IoTrash />
             </IconButton>
           </div>
         </div>
