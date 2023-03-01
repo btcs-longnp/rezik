@@ -14,12 +14,11 @@ import Playlist, { commitPlaylist } from '../../models/songRequest/Playlist';
 export type SnapshotPlaylistHandler = (playlist?: Playlist) => void;
 
 class PlaylistRepository {
-  baseURL: string;
+  baseURL: string = 'rezik';
   audience: string;
   playlistCollection: CollectionReference;
 
   constructor(audience: string) {
-    this.baseURL = 'rezik';
     this.audience = audience;
     this.playlistCollection = collection(
       doc(collection(getFirestore(), this.baseURL), this.audience),
