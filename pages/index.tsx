@@ -32,6 +32,7 @@ const Player: NextPage = () => {
   const currentRequestId = useRef<string>('');
   const prevPlaylistLength = useRef<number>(0);
   const shadowSongIndex = useRef<number>(0);
+  const syncFirstTimeDone = useRef(false);
 
   const onReady = () => {
     console.log('player: onReady');
@@ -117,7 +118,7 @@ const Player: NextPage = () => {
     console.log('player: change songIndex:', songIndex);
     shadowSongIndex.current = songIndex;
 
-    if (isSync) {
+    if (isSync && syncFirstTimeDone.current) {
       controllerRepo.updateSongIndex(songIndex);
     }
   }, [songIndex, isSync]);
@@ -156,6 +157,7 @@ const Player: NextPage = () => {
         console.log('player: song index changed:', songIndex);
 
         setSongIndex(songIndex);
+        syncFirstTimeDone.current = true;
       }
     );
 
