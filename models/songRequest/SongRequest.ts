@@ -9,9 +9,13 @@ interface SongRequest {
   requestTime: Date;
 }
 
-export const newSongRequest = (song: YoutubeSong, user: User): SongRequest => {
+export const newSongRequest = (
+  song: YoutubeSong,
+  user: User,
+  requestId?: string
+): SongRequest => {
   return {
-    id: ulid(),
+    id: requestId || ulid(),
     song,
     user,
     requestTime: new Date(),

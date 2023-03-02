@@ -7,20 +7,20 @@ import {
   onSnapshot,
   Unsubscribe,
   setDoc,
+  updateDoc,
 } from 'firebase/firestore';
+import { PlayerState } from '../../models/playerState/playerState';
 
-export type SnapshotControllerHandler = (controller: {
-  songIndex: number;
-}) => void;
+export type SnapshotControllerHandler = (state: PlayerState) => void;
 
-class ControllerRepository {
+class PlayerStateRepository {
   baseURL: string = 'rezik';
   controllerCollection: CollectionReference;
 
   constructor(private audience: string) {
     this.controllerCollection = collection(
       doc(collection(getFirestore(), this.baseURL), this.audience),
-      'controllers'
+      'playerStates'
     );
   }
 
@@ -28,7 +28,7 @@ class ControllerRepository {
     const unsub = onSnapshot(
       doc(this.controllerCollection, 'default'),
       (doc) => {
-        handler(doc.data() as { songIndex: number });
+        handler(doc.data() as PlayerState);
       }
     );
 
@@ -39,9 +39,13 @@ class ControllerRepository {
     return deleteDoc(doc(this.controllerCollection, 'default'));
   }
 
-  async updateSongIndex(songIndex: number) {
-    setDoc(doc(this.controllerCollection, 'default'), { songIndex });
+  async setPlayerState(state: PlayerState) {
+    setDoc(doc(this.controllerCollection, 'default'), state);
+  }
+
+  async updatePlayerState(state: Partial<PlayerState>) {
+    updateDoc(doc(this.controllerCollection, 'default'), state);
   }
 }
 
-export default ControllerRepository;
+export default PlayerStateRepository;
