@@ -15,13 +15,11 @@ export type SnapshotPlaylistHandler = (playlist?: Playlist) => void;
 
 class PlaylistRepository {
   baseURL: string = 'rezik';
-  audience: string;
   playlistCollection: CollectionReference;
 
-  constructor(audience: string) {
-    this.audience = audience;
+  constructor(private roomId: string) {
     this.playlistCollection = collection(
-      doc(collection(getFirestore(), this.baseURL), this.audience),
+      doc(collection(getFirestore(), this.baseURL), this.roomId),
       'playlists'
     );
   }

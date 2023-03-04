@@ -17,9 +17,9 @@ class PlayerStateRepository {
   baseURL: string = 'rezik';
   controllerCollection: CollectionReference;
 
-  constructor(private audience: string) {
+  constructor(private roomId: string) {
     this.controllerCollection = collection(
-      doc(collection(getFirestore(), this.baseURL), this.audience),
+      doc(collection(getFirestore(), this.baseURL), this.roomId),
       'playerStates'
     );
   }
