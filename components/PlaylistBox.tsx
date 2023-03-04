@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, FC, useCallback } from 'react';
 import { newYoutubeSong } from '../models/song/YoutubeSong';
 import PlaylistRepository from '../services/firestore/PlaylistRepository';
 import Playlist, { newPlaylist } from '../models/songRequest/Playlist';
-import MusicController from './MusicController';
+import MusicController, { MusicControllerOptions } from './MusicController';
 import SongCard from './SongCard';
 import PlayerStateRepository from '../services/firestore/PlayerStateRepository';
 import {
@@ -34,9 +34,13 @@ const defaultSongReq = newSongRequest(
 
 export interface PlaylistBoxProps {
   onSongReqChange?: (songReq: SongRequest) => void;
+  musicControllerOptions?: MusicControllerOptions;
 }
 
-const PlaylistBox: FC<PlaylistBoxProps> = ({ onSongReqChange }) => {
+const PlaylistBox: FC<PlaylistBoxProps> = ({
+  onSongReqChange,
+  musicControllerOptions,
+}) => {
   const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
   const [playerState, setPlayerState] = useState<PlayerState>(
     newPlayerState(defaultSongReq, 0)
@@ -48,6 +52,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({ onSongReqChange }) => {
   const syncFirstTimeDone = useRef(false);
   const shadowPlayerState = useRef(playerState);
   const shadowIsSync = useRef(isSync);
+  const isMouseEnterPlaylist = useRef(false);
 
   const next = () => {
     if (songReqIndex.current >= playlist.list.length - 1) {
@@ -120,12 +125,17 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({ onSongReqChange }) => {
     setCurSongReq(shuffleList[songReqIndex.current]);
   };
 
-  useEffect(() => {
-    console.log(
-      'player: change list or change playerState',
-      playerState.requestId
-    );
+  const handleMouseEnter = () => {
+    console.log('### mouse enter playlist');
+    isMouseEnterPlaylist.current = true;
+  };
 
+  const handleMouseLeave = () => {
+    console.log('### mouse out');
+    isMouseEnterPlaylist.current = false;
+  };
+
+  useEffect(() => {
     if (playlist.list.length === 0) {
       setCurSongReq(defaultSongReq);
       songReqIndex.current = 0;
@@ -191,6 +201,20 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({ onSongReqChange }) => {
   }, [curSongReq]);
 
   useEffect(() => {
+    // prevent auto scroll when user are reacting with playlist
+    if (isMouseEnterPlaylist.current) {
+      return;
+    }
+
+    const songCardRef = document.getElementById(curSongReq.id);
+    if (!songCardRef) {
+      return;
+    }
+
+    songCardRef.scrollIntoView();
+  }, [curSongReq]);
+
+  useEffect(() => {
     const unsubPlaylist = playlistRepo.onSnapshotPlaylist((playlist) => {
       console.log('player: playlist changed:', playlist);
       if (!playlist) return;
@@ -227,44 +251,62 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({ onSongReqChange }) => {
     playerEvent.on('ended', handleVideoEndOrError);
     playerEvent.on('error', handleVideoEndOrError);
 
-    console.log('### player event', playerEvent);
-
     return () => {
       playerEvent.removeListener('ended', handleVideoEndOrError);
       playerEvent.removeListener('error', handleVideoEndOrError);
     };
   }, [handleVideoEndOrError]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        isMouseEnterPlaylist.current = false;
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   return (
-    <div>
-      <div className='absolute w-96 h-full blur-3xl'>
+    <div className='relative w-96 h-full'>
+      <div className='absolute w-full h-full blur-3xl z-10'>
         <img
           src={curSongReq.song.thumbnail}
           alt=''
           className='object-cover h-full w-full'
         />
       </div>
-      <div className='w-96 h-screen grid grid-rows-[1fr_auto] z-50 p-2 bg-transparent relative'>
-        <div className='overflow-y-auto space-y-2'>
+      <div className='relative w-full h-full z-30 p-2 backdrop-blur-xl'>
+        <div
+          className='overflow-y-auto space-y-2 h-full'
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           {playlist.list.map((songReq) => (
             <SongCard
               key={songReq.id}
               songRequest={songReq}
-              isPlaying={curSongReq.id === songReq.id}
+              isCurSong={curSongReq.id === songReq.id}
               play={() => playBySongReqId(songReq.id)}
               remove={() => removeSongRequest(songReq.id)}
             />
           ))}
+          <div className='h-16' />
         </div>
-        <div>
+      </div>
+      <div className='absolute bottom-0 w-full z-50 backdrop-blur-md'>
+        <div className='relative p-2'>
           <MusicController
-            play={play}
-            pause={pause}
             next={next}
             previous={previous}
             shuffle={shufflePlaylist}
             setIsSync={handleSetIsSync}
             clearPlaylist={clearPlaylist}
+            options={musicControllerOptions}
           />
         </div>
       </div>
