@@ -1,20 +1,29 @@
 /* eslint-disable @next/next/no-img-element */
-import { useRef, useEffect, useState, FC, useCallback } from 'react';
+import {
+  useRef,
+  useEffect,
+  useState,
+  FC,
+  useCallback,
+  ReactElement,
+} from 'react';
 
-import { newYoutubeSong } from '../models/song/YoutubeSong';
-import PlaylistRepository from '../services/firestore/PlaylistRepository';
-import Playlist, { newPlaylist } from '../models/songRequest/Playlist';
-import MusicController, { MusicControllerOptions } from './MusicController';
-import SongCard from './SongCard';
-import PlayerStateRepository from '../services/firestore/PlayerStateRepository';
+import { newYoutubeSong } from '../../models/song/YoutubeSong';
+import PlaylistRepository from '../../services/firestore/PlaylistRepository';
+import Playlist, { newPlaylist } from '../../models/songRequest/Playlist';
+import MusicController, { MusicControllerOptions } from '../MusicController';
+import SongCard from '../SongCard';
+import PlayerStateRepository from '../../services/firestore/PlayerStateRepository';
 import {
   newPlayerState,
   PlayerState,
   updatePlayerState,
-} from '../models/playerState/playerState';
-import SongRequest, { newSongRequest } from '../models/songRequest/SongRequest';
-import { newUser } from '../models/user/User';
-import { playerEvent } from '../models/eventEmitter/player';
+} from '../../models/playerState/playerState';
+import SongRequest, {
+  newSongRequest,
+} from '../../models/songRequest/SongRequest';
+import { getAnonymousUser } from '../../models/user/User';
+import { playerEvent } from '../../models/eventEmitter/player';
 
 const playlistRepo = new PlaylistRepository('isling');
 const playlistStateRepo = new PlayerStateRepository('isling');
@@ -28,18 +37,20 @@ const defaultSong = newYoutubeSong(
 
 const defaultSongReq = newSongRequest(
   defaultSong,
-  newUser('0000', 'isling'),
-  '0000'
+  getAnonymousUser(),
+  '0000000000'
 );
 
 export interface PlaylistBoxProps {
   onSongReqChange?: (songReq: SongRequest) => void;
   musicControllerOptions?: MusicControllerOptions;
+  header: ReactElement;
 }
 
 const PlaylistBox: FC<PlaylistBoxProps> = ({
   onSongReqChange,
   musicControllerOptions,
+  header,
 }) => {
   const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0));
   const [playerState, setPlayerState] = useState<PlayerState>(
@@ -53,6 +64,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const shadowPlayerState = useRef(playerState);
   const shadowIsSync = useRef(isSync);
   const isMouseEnterPlaylist = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const next = () => {
     if (songReqIndex.current >= playlist.list.length - 1) {
@@ -94,10 +106,6 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     shadowIsSync.current = enable;
     setIsSync(enable);
   };
-
-  const play = () => {};
-
-  const pause = () => {};
 
   const removeSongRequest = async (rmSongReqId: string) => {
     const newList = [...playlist.list].filter(
@@ -207,11 +215,17 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     }
 
     const songCardRef = document.getElementById(curSongReq.id);
-    if (!songCardRef) {
+    const topBarPlaceholder = document.getElementById('top-bar-placeholder');
+    const topBarPlaceholderHeight = topBarPlaceholder?.clientHeight || 0;
+
+    if (!songCardRef || !scrollRef.current) {
       return;
     }
 
-    songCardRef.scrollIntoView();
+    scrollRef.current.scrollTo({
+      top: Math.max(songCardRef.offsetTop - topBarPlaceholderHeight - 8, 0),
+      behavior: 'smooth',
+    });
   }, [curSongReq]);
 
   useEffect(() => {
@@ -280,12 +294,14 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           className='object-cover h-full w-full'
         />
       </div>
-      <div className='relative w-full h-full z-30 p-2 backdrop-blur-xl'>
+      <div className='relative w-full h-full z-20 px-2 backdrop-blur-xl'>
         <div
+          ref={scrollRef}
           className='overflow-y-auto space-y-2 h-full'
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
+          <div className='h-10' id='top-bar-placeholder' />
           {playlist.list.map((songReq) => (
             <SongCard
               key={songReq.id}
@@ -298,7 +314,10 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           <div className='h-16' />
         </div>
       </div>
-      <div className='absolute bottom-0 w-full z-50 backdrop-blur-md'>
+      <div className='absolute top-0 left-0 h-10 w-full backdrop-blur-md z-40'>
+        {header}
+      </div>
+      <div className='absolute bottom-0 w-full z-40 backdrop-blur-md'>
         <div className='relative p-2'>
           <MusicController
             next={next}

@@ -1,7 +1,9 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import Modal from '../../components/atoms/Modal';
 
-import PlaylistBox from '../../components/PlaylistBox';
+import PlaylistBox from '../../components/playlistBox/PlaylistBox';
+import PlaylistBoxHeader from '../../components/playlistBox/PlaylistBoxHeader';
 
 const Vote: NextPage = () => {
   return (
@@ -11,7 +13,7 @@ const Vote: NextPage = () => {
         <meta name='description' content='Watch video together' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-
+      <Modal />
       <main>
         <div className='grid grid-cols-[1fr_auto]'>
           <div className='relative h-screen grid place-items-center'>
@@ -23,6 +25,7 @@ const Vote: NextPage = () => {
                 restrictPlayBtn: true,
                 restrictOffSync: true,
               }}
+              header={<PlaylistBoxHeader page='vote' />}
             />
           </div>
         </div>
