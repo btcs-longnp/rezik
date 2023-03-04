@@ -9,7 +9,7 @@ import {
 } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
 import { isPlayingStore } from '../stores/player';
-import IconButton from './IconButton';
+import IconButton from './atoms/IconButton';
 
 export interface MusicControllerOptions {
   restrictPlayBtn?: boolean;
@@ -42,7 +42,7 @@ const MusicController: FC<MusicControllerProps> = (props) => {
   }, [isSync, props]);
 
   return (
-    <div className='flex justify-around items-center rounded-full px-3 py-2 bg-opacity-80 bg-[#44475a] hover:bg-opacity-95 transition-all duration-300'>
+    <div className='flex justify-around items-center rounded-full px-3 py-2 bg-opacity-80 bg-primary-light hover:bg-opacity-95 transition-all duration-300'>
       <IconButton onClick={props.previous}>
         <IoPlayBack />
       </IconButton>

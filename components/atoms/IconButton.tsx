@@ -1,7 +1,7 @@
 import { FC, PropsWithChildren } from 'react';
 
 interface ControllerButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
 }
 
@@ -12,7 +12,8 @@ const IconButton: FC<PropsWithChildren<ControllerButtonProps>> = ({
 }) => (
   <button
     className={`
-      flex justify-center items-center rounded-full h-10 w-10 text-white font-semibold hover:bg-gray-800 bg-opacity-20
+      flex justify-center items-center rounded-full h-10 w-10 font-semibold bg-opacity-20
+      text-white hover:bg-gray-800 active:bg-gray-900
       ${disabled ? 'cursor-not-allowed' : ''}
     `}
     onClick={onClick}

@@ -2,7 +2,7 @@
 import { FC } from 'react';
 import { IoPlay, IoTrash } from 'react-icons/io5';
 import SongRequest from '../models/songRequest/SongRequest';
-import IconButton from './IconButton';
+import IconButton from './atoms/IconButton';
 
 export interface SongCardProps {
   songRequest: SongRequest;
@@ -20,7 +20,7 @@ const SongCard: FC<SongCardProps> = ({
   return (
     <div
       id={songRequest.id}
-      className={`grid grid-cols-[auto_1fr] group hover:bg-teal-800 hover:bg-opacity-40 ${
+      className={`grid grid-cols-[auto_1fr] group rounded-sm overflow-hidden hover:bg-white/30 ${
         isPlaying ? 'bg-rose-400 bg-opacity-75' : ''
       }`}
     >
@@ -49,7 +49,7 @@ const SongCard: FC<SongCardProps> = ({
               <IoPlay />
             </IconButton>
             <IconButton onClick={remove}>
-              <IoTrash className='text-rose-400' />
+              <IoTrash />
             </IconButton>
           </div>
         </div>

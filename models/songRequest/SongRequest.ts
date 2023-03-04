@@ -1,4 +1,4 @@
-import { ulid } from 'ulid';
+import { nanoid } from 'nanoid';
 import YoutubeSong from '../song/YoutubeSong';
 import User from '../user/User';
 
@@ -15,7 +15,7 @@ export const newSongRequest = (
   requestId?: string
 ): SongRequest => {
   return {
-    id: requestId || ulid(),
+    id: requestId || nanoid(),
     song,
     user,
     requestTime: new Date(),
