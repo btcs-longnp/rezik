@@ -18,7 +18,12 @@ const Vote: NextPage = () => {
             Search video placeholder
           </div>
           <div className='w-96 h-screen relative overflow-hidden bg-[#282a36]'>
-            <PlaylistBox />
+            <PlaylistBox
+              musicControllerOptions={{
+                restrictPlayBtn: true,
+                restrictOffSync: true,
+              }}
+            />
           </div>
         </div>
       </main>

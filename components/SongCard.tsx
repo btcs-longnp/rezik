@@ -6,19 +6,20 @@ import IconButton from './IconButton';
 
 export interface SongCardProps {
   songRequest: SongRequest;
-  isPlaying: boolean;
+  isCurSong: boolean;
   play: () => void;
   remove: () => void;
 }
 
 const SongCard: FC<SongCardProps> = ({
   songRequest,
-  isPlaying,
+  isCurSong: isPlaying,
   play,
   remove,
 }) => {
   return (
     <div
+      id={songRequest.id}
       className={`grid grid-cols-[auto_1fr] group hover:bg-teal-800 hover:bg-opacity-40 ${
         isPlaying ? 'bg-rose-400 bg-opacity-75' : ''
       }`}
@@ -48,7 +49,7 @@ const SongCard: FC<SongCardProps> = ({
               <IoPlay />
             </IconButton>
             <IconButton onClick={remove}>
-              <IoTrash />
+              <IoTrash className='text-rose-400' />
             </IconButton>
           </div>
         </div>
