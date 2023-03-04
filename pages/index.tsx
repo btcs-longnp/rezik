@@ -8,6 +8,8 @@ import SongRequest, { newSongRequest } from '../models/songRequest/SongRequest';
 import { newUser } from '../models/user/User';
 import PlaylistBox from '../components/PlaylistBox';
 import { playerEvent } from '../models/eventEmitter/player';
+import { useRecoilState } from 'recoil';
+import { isPlayingStore } from '../stores/player';
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v=';
 
@@ -26,7 +28,7 @@ const defaultSongReq = newSongRequest(
 
 const Player: NextPage = () => {
   const player = useRef<any>();
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore);
   const [curSongReq, setCurSongReq] = useState<SongRequest>(defaultSongReq);
 
   const onReady = () => {
