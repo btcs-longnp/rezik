@@ -10,7 +10,7 @@ export const newUser = (id: string, name: string): User => {
   };
 };
 
-const anonymousUserId = 'yC1x9AxbDMWyOYKu_Awoe';
+const anonymousUserId = 'NskKXKnVXDArA3DwhOPLe';
 
 export const getAnonymousUser = () => {
   return newUser(anonymousUserId, 'Cáo Ẩn Danh');

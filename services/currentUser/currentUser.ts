@@ -18,6 +18,10 @@ export const setLocalAccount = (user: User) => {
   localStorage.setItem(localAccountKey, userJSON);
 };
 
+export const removeLocalAccount = () => {
+  localStorage.removeItem(localAccountKey);
+};
+
 export const getAvatarString = (user: User) => {
   if (user.name === '') {
     return '-';

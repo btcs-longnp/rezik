@@ -13,7 +13,7 @@ const IconButton: FC<PropsWithChildren<ControllerButtonProps>> = ({
   <button
     className={`
       flex justify-center items-center rounded-full h-10 w-10 font-semibold bg-opacity-20
-      text-white hover:bg-gray-800 active:bg-gray-900
+      text-secondary hover:bg-primary/40 active:bg-primary/70
       ${disabled ? 'cursor-not-allowed' : ''}
     `}
     onClick={onClick}
