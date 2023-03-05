@@ -1,7 +1,7 @@
-import { nanoid } from 'nanoid';
 import { FC, useState } from 'react';
 import { useSetRecoilState } from 'recoil';
-import { newUser } from '../../models/user/User';
+import { Account } from '../../models/account/Account';
+import { saveAccountToLocal } from '../../services/simpleAuth/localAccount';
 import { currentUserStore } from '../../stores/currentUser';
 import Button from '../atoms/Button';
 import Input from '../atoms/Input';
@@ -9,40 +9,29 @@ import { closeModal, openModal } from '../atoms/Modal';
 import SignUpAndProfile from './SignUpAndProfile';
 
 const SignIn: FC = () => {
-  const [user, setUser] = useState(newUser('', ''));
+  const [magicToken, setMagicToken] = useState('');
   const setCurrentUser = useSetRecoilState(currentUserStore);
-  const [isNotValidId, setIsNotValidId] = useState(false);
+  const [isNotValidToken, setIsNotValidToken] = useState(false);
 
-  const idInputDescription = isNotValidId
-    ? "Not a valid account ID. Account ID should look like 'xsUhRUhNhMK9jXokL08Bi'"
-    : 'Copy and paste your account ID here';
+  const idInputDescription = isNotValidToken
+    ? 'Not a valid Login Magic Token'
+    : 'Copy your Login Magic Token and paste here';
 
-  const changeName = (name: string) => {
-    if (name.length > 40) {
-      return;
-    }
-
-    setUser(newUser(user.id, name));
-  };
-
-  const changeUserId = (id: string) => {
-    setUser(newUser(id.trim(), user.name));
-    setIsNotValidId(false);
+  const changeMagicToken = (token: string) => {
+    setMagicToken(token.trim());
+    setIsNotValidToken(false);
   };
 
   const signIn = () => {
-    if (user.id.length !== nanoid().length) {
-      setIsNotValidId(true);
+    const account = Account.fromMagicToken(magicToken);
+
+    if (!account) {
+      setIsNotValidToken(true);
       return;
     }
 
-    let name = user.name.trim();
-
-    if (name === '') {
-      name = 'Cáo Ẩn Danh';
-    }
-
-    setCurrentUser(newUser(user.id, name));
+    setCurrentUser(account.user);
+    saveAccountToLocal(account);
     closeModal();
   };
 
@@ -62,20 +51,12 @@ const SignIn: FC = () => {
           <div>
             <Input
               type='text'
-              value={user.id}
-              onTextChange={changeUserId}
-              label='Account ID'
+              value={magicToken}
+              onTextChange={changeMagicToken}
+              label='Login Magic Token'
               description={idInputDescription}
-              isError={isNotValidId}
+              isError={isNotValidToken}
               autoFocus
-            />
-          </div>
-          <div>
-            <Input
-              type='text'
-              value={user.name}
-              onTextChange={changeName}
-              label='Name'
             />
           </div>
         </div>
