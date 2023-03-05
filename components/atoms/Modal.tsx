@@ -16,6 +16,10 @@ export const openModal = (options: OpenModalOptions) => {
   eventEmitter.emit('openModal');
 };
 
+export const closeModal = () => {
+  eventEmitter.emit('closeModal');
+};
+
 const Modal: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [_, setForceUpdate] = useState(true);
@@ -34,10 +38,15 @@ const Modal: FC = () => {
       setIsOpen(true);
     });
 
+    eventEmitter.on('closeModal', () => {
+      closeModal();
+    });
+
     return () => {
       eventEmitter.removeAllListeners('openModal');
+      eventEmitter.removeAllListeners('closeModal');
     };
-  }, [isOpen]);
+  }, [isOpen, closeModal]);
 
   return (
     <div

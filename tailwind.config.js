@@ -13,6 +13,7 @@ module.exports = {
           light: '#44475a',
           DEFAULT: '#282a36',
         },
+        comment: '#6272a4',
       },
     },
   },

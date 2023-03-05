@@ -4,12 +4,12 @@ import Head from 'next/head';
 import ReactPlayer from 'react-player';
 
 import SongRequest from '../models/songRequest/SongRequest';
-import PlaylistBox from '../components/playlistBox/PlaylistBox';
+import PlaylistBox from '../components/templates/playlistBox/PlaylistBox';
 import { playerEvent } from '../models/eventEmitter/player';
 import { useRecoilState } from 'recoil';
 import { isPlayingStore } from '../stores/player';
 import Modal from '../components/atoms/Modal';
-import PlaylistBoxHeader from '../components/playlistBox/PlaylistBoxHeader';
+import PlaylistBoxHeader from '../components/templates/playlistBox/PlaylistBoxHeader';
 import { IoPlay } from 'react-icons/io5';
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v=';
