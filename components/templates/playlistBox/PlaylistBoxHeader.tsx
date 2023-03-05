@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   IoLogInOutline,
   IoLogOutOutline,
@@ -6,8 +6,9 @@ import {
   IoPersonOutline,
   IoWarningOutline,
 } from 'react-icons/io5';
+import { Account } from '../../../models/account/Account';
 import { isAnonymousUser } from '../../../models/user/User';
-import { getAvatarString } from '../../../services/currentUser/currentUser';
+import { getAccountFromLocal } from '../../../services/simpleAuth/localAccount';
 import { useAuth } from '../../../services/hook/useAuth';
 import Button from '../../atoms/Button';
 import CopyButton from '../../atoms/CopyButton';
@@ -16,6 +17,7 @@ import Menu, { MenuItem } from '../../atoms/Menu';
 import { openModal } from '../../atoms/Modal';
 import SignIn from '../SignIn';
 import SignUpAndProfile from '../SignUpAndProfile';
+import { getAvatarString } from '../../../services/utils/user';
 
 export interface PlaylistBoxHeaderProps {
   page?: 'player' | 'vote';
@@ -23,16 +25,35 @@ export interface PlaylistBoxHeaderProps {
 
 const PlaylistBoxHeader: FC<PlaylistBoxHeaderProps> = ({ page = 'player' }) => {
   const { currentUser, signOut } = useAuth();
+  const [account, setAccount] = useState<Account>();
+
   const openModalSignUpOrProfile = () => {
     openModal({
       body: <SignUpAndProfile />,
     });
   };
+
   const openModalSignIn = () => {
     openModal({
       body: <SignIn />,
     });
   };
+
+  const copyLoginMagicLink = () => {
+    const btn = document.getElementById('copy-magic-link-btn');
+    btn?.click();
+  };
+
+  useEffect(() => {
+    if (!isAnonymousUser(currentUser)) {
+      const acc = getAccountFromLocal();
+
+      setAccount(acc);
+      return;
+    }
+
+    setAccount(undefined);
+  }, [currentUser]);
 
   const GuestMenu = (
     <Menu className='w-48'>
@@ -59,14 +80,19 @@ const PlaylistBoxHeader: FC<PlaylistBoxHeaderProps> = ({ page = 'player' }) => {
   );
 
   const UserMenu = (
-    <Menu>
+    <Menu className='w-48'>
       <div className='px-3 py-2'>
         <div className='text-sm truncate max-w-[164px]'>{currentUser.name}</div>
-        <div className='flex items-center space-x-1'>
-          <div className='text-xs'>{currentUser.id}</div>
-          <CopyButton content={currentUser.id} className='text-sm' />
-        </div>
       </div>
+      <MenuItem onClick={copyLoginMagicLink}>
+        <div className='flex items-center'>
+          <CopyButton
+            id='copy-magic-link-btn'
+            content={account?.toMagicToken() || ''}
+          />
+          <div className='ml-2 text-xs'>Copy Login Magic Token</div>
+        </div>
+      </MenuItem>
       <MenuItem onClick={openModalSignUpOrProfile}>
         <div className='flex items-center'>
           <IoPersonOutline className='text-md' />

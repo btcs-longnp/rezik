@@ -2,15 +2,20 @@ import { nanoid } from 'nanoid';
 import { FC, useEffect, useRef, useState } from 'react';
 import { IoCheckmarkCircle } from 'react-icons/io5';
 import { useRecoilState } from 'recoil';
+import { Account } from '../../models/account/Account';
 import { isAnonymousUser, newUser } from '../../models/user/User';
+import {
+  getAccountFromLocal,
+  saveAccountToLocal,
+} from '../../services/simpleAuth/localAccount';
 import { currentUserStore } from '../../stores/currentUser';
 import Button from '../atoms/Button';
-import CopyButton from '../atoms/CopyButton';
 import Input from '../atoms/Input';
 
 const SignUpAndProfile: FC = () => {
   const [isDone, setIsDone] = useState(false);
   const [user, setUser] = useState(newUser('', ''));
+  const account = useRef(new Account(''));
   const [currentUser, setCurrentUser] = useRecoilState(currentUserStore);
   const isCreateAccount = useRef(isAnonymousUser(currentUser));
 
@@ -29,7 +34,10 @@ const SignUpAndProfile: FC = () => {
       name = 'Cáo Ẩn Danh';
     }
 
-    setCurrentUser(newUser(user.id, name));
+    account.current.user.name = name;
+    saveAccountToLocal(account.current);
+
+    setCurrentUser(account.current.user);
 
     setTimeout(() => {
       setIsDone(true);
@@ -39,9 +47,16 @@ const SignUpAndProfile: FC = () => {
   useEffect(() => {
     if (!isAnonymousUser(currentUser)) {
       setUser(currentUser);
+      const acc = getAccountFromLocal();
+
+      if (acc) {
+        account.current = acc;
+      }
+
       return;
     }
 
+    account.current = new Account('');
     setUser(newUser(nanoid(), ''));
   }, [currentUser]);
 
@@ -66,15 +81,6 @@ const SignUpAndProfile: FC = () => {
           {isCreateAccount.current ? 'Sign Up' : 'Your Profile'}
         </div>
         <div className='w-80 space-y-4'>
-          <div>
-            <Input
-              type='text'
-              disabled
-              value={user.id}
-              addonAfter={<CopyButton content={user.id} />}
-              label='Account ID'
-            />
-          </div>
           <div>
             <Input
               type='text'
