@@ -1,25 +1,22 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
-import { getAnonymousUser, isAnonymousUser } from '../../models/user/User';
+import { getAnonymousUser } from '../../models/user/User';
 import { currentUserStore } from '../../stores/currentUser';
-import { getLocalAccount, setLocalAccount } from '../currentUser/currentUser';
+import { getAccountFromLocal } from '../simpleAuth/localAccount';
 
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserStore);
 
-  useEffect(() => {
-    const localAccount = getLocalAccount();
-
-    setCurrentUser(localAccount || getAnonymousUser());
+  const signOut = useCallback(() => {
+    setCurrentUser(getAnonymousUser());
+    localStorage.removeItem('isling-me-kitsune');
   }, [setCurrentUser]);
 
   useEffect(() => {
-    if (isAnonymousUser(currentUser)) {
-      return;
-    }
+    const account = getAccountFromLocal();
 
-    setLocalAccount(currentUser);
-  }, [currentUser]);
+    setCurrentUser(account?.user || getAnonymousUser());
+  }, [setCurrentUser]);
 
-  return currentUser;
+  return { currentUser, signOut };
 };

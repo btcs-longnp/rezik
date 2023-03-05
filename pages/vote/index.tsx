@@ -2,8 +2,8 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Modal from '../../components/atoms/Modal';
 
-import PlaylistBox from '../../components/playlistBox/PlaylistBox';
-import PlaylistBoxHeader from '../../components/playlistBox/PlaylistBoxHeader';
+import PlaylistBox from '../../components/templates/playlistBox/PlaylistBox';
+import PlaylistBoxHeader from '../../components/templates/playlistBox/PlaylistBoxHeader';
 
 const Vote: NextPage = () => {
   return (

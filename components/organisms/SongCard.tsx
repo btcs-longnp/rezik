@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { FC } from 'react';
 import { IoPlay, IoTrash } from 'react-icons/io5';
-import SongRequest from '../models/songRequest/SongRequest';
-import IconButton from './atoms/IconButton';
+import SongRequest from '../../models/songRequest/SongRequest';
+import IconButton from '../atoms/IconButton';
 
 export interface SongCardProps {
   songRequest: SongRequest;
@@ -20,11 +20,11 @@ const SongCard: FC<SongCardProps> = ({
   return (
     <div
       id={songRequest.id}
-      className={`grid grid-cols-[auto_1fr] group rounded-sm overflow-hidden hover:bg-white/30 ${
+      className={`grid grid-cols-[auto_1fr] group rounded overflow-hidden hover:bg-white/30 ${
         isPlaying ? 'bg-rose-400 bg-opacity-75' : ''
       }`}
     >
-      <div className='w-20 h-20 relative'>
+      <div className='w-28 h-20 relative'>
         {isPlaying && (
           <div className='absolute w-full h-full grid place-items-center'>
             <IoPlay
