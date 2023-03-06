@@ -8,53 +8,53 @@ import {
   getFirestore,
   onSnapshot,
   Unsubscribe,
-} from 'firebase/firestore';
-import Playlist, { commitPlaylist } from '../../models/songRequest/Playlist';
+} from 'firebase/firestore'
+import Playlist, { commitPlaylist } from '../../models/songRequest/Playlist'
 
-export type SnapshotPlaylistHandler = (playlist?: Playlist) => void;
+export type SnapshotPlaylistHandler = (playlist?: Playlist) => void
 
 class PlaylistRepository {
-  baseURL: string = 'rezik';
-  playlistCollection: CollectionReference;
+  baseURL = 'rezik'
+  playlistCollection: CollectionReference
 
   constructor(private roomId: string) {
     this.playlistCollection = collection(
       doc(collection(getFirestore(), this.baseURL), this.roomId),
       'playlists'
-    );
+    )
   }
 
   onSnapshotPlaylist(handler: SnapshotPlaylistHandler): Unsubscribe {
     const unsub = onSnapshot(doc(this.playlistCollection, 'default'), (doc) => {
-      handler(doc.data() as Playlist | undefined);
-    });
+      handler(doc.data() as Playlist | undefined)
+    })
 
-    return unsub;
+    return unsub
   }
 
   async setPlaylist(playlist: Playlist) {
-    console.log('setPlaylist', playlist);
-    const docSnap = await getDoc(doc(this.playlistCollection, 'default'));
+    console.log('setPlaylist', playlist)
+    const docSnap = await getDoc(doc(this.playlistCollection, 'default'))
     if (docSnap.exists()) {
       if (docSnap.data().version !== playlist.version) {
         console.log(
           `setPlaylist: can not update: data on server has updated. Server: ver${
             docSnap.data().version
           }, Client: ver${playlist.version}`
-        );
-        return;
+        )
+        return
       }
     }
 
     return setDoc(
       doc(this.playlistCollection, 'default'),
       commitPlaylist(playlist)
-    );
+    )
   }
 
   async removePlaylist() {
-    return deleteDoc(doc(this.playlistCollection, 'default'));
+    return deleteDoc(doc(this.playlistCollection, 'default'))
   }
 }
 
-export default PlaylistRepository;
+export default PlaylistRepository

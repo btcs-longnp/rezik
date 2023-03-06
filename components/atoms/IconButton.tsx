@@ -1,8 +1,8 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren } from 'react'
 
 interface ControllerButtonProps {
-  onClick?: () => void;
-  disabled?: boolean;
+  onClick?: () => void
+  disabled?: boolean
 }
 
 const IconButton: FC<PropsWithChildren<ControllerButtonProps>> = ({
@@ -21,6 +21,6 @@ const IconButton: FC<PropsWithChildren<ControllerButtonProps>> = ({
   >
     {children}
   </button>
-);
+)
 
-export default IconButton;
+export default IconButton

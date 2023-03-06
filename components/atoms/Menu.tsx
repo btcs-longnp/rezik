@@ -1,4 +1,4 @@
-import { FC, HTMLProps } from 'react';
+import { FC, HTMLProps } from 'react'
 
 export const MenuItem: FC<HTMLProps<HTMLDivElement>> = (props) => {
   return (
@@ -8,8 +8,8 @@ export const MenuItem: FC<HTMLProps<HTMLDivElement>> = (props) => {
     >
       {props.children}
     </div>
-  );
-};
+  )
+}
 
 const Menu: FC<HTMLProps<HTMLDivElement>> = (props) => {
   return (
@@ -19,7 +19,7 @@ const Menu: FC<HTMLProps<HTMLDivElement>> = (props) => {
     >
       {props.children}
     </div>
-  );
-};
+  )
+}
 
-export default Menu;
+export default Menu

@@ -1,24 +1,24 @@
-import { ChangeEvent, FC, HTMLProps, ReactElement } from 'react';
+import { ChangeEvent, FC, HTMLProps, ReactElement } from 'react'
 
 export interface InputProps extends Omit<HTMLProps<HTMLInputElement>, 'label'> {
-  label?: string | ReactElement;
-  description?: string;
-  isError?: boolean;
-  onTextChange?: (text: string) => void;
-  addonBefore?: ReactElement;
-  addonAfter?: ReactElement;
+  label?: string | ReactElement
+  description?: string
+  isError?: boolean
+  onTextChange?: (text: string) => void
+  addonBefore?: ReactElement
+  addonAfter?: ReactElement
 }
 
 const Input: FC<InputProps> = (props) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (props.onTextChange) {
-      props.onTextChange(e.target.value);
+      props.onTextChange(e.target.value)
     }
-  };
+  }
 
   return (
     <div>
-      {props.label && <div className='mb-1 text-sm'>{props.label}</div>}
+      {props.label && <div className="mb-1 text-sm">{props.label}</div>}
       <div
         className={`
         grid grid-cols-[auto_1fr_auto] 
@@ -28,13 +28,13 @@ const Input: FC<InputProps> = (props) => {
         } bg-primary/70
       `}
       >
-        <div className='h-full'>{props.addonBefore}</div>
+        <div className="h-full">{props.addonBefore}</div>
         <input
           {...props}
-          className='w-full h-full outline-none bg-transparent'
+          className="w-full h-full outline-none bg-transparent"
           onChange={handleChange}
         />
-        <div className='h-full'>{props.addonAfter}</div>
+        <div className="h-full">{props.addonAfter}</div>
       </div>
       {props.description && (
         <div
@@ -46,7 +46,7 @@ const Input: FC<InputProps> = (props) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Input;
+export default Input

@@ -1,22 +1,21 @@
-import { Account } from '../../models/account/Account';
-import User from '../../models/user/User';
+import { Account } from '../../models/account/Account'
 
-const localStorageKey = 'isling-me-kitsune';
+const localStorageKey = 'isling-me-kitsune'
 
 export const saveAccountToLocal = (account: Account) => {
-  localStorage.setItem(localStorageKey, account.toMagicToken());
-};
+  localStorage.setItem(localStorageKey, account.toMagicToken())
+}
 
 export const getAccountFromLocal = () => {
-  const token = localStorage.getItem(localStorageKey);
+  const token = localStorage.getItem(localStorageKey)
 
   if (!token) {
-    return undefined;
+    return undefined
   }
 
-  return Account.fromMagicToken(token);
-};
+  return Account.fromMagicToken(token)
+}
 
 export const removeAccountOnLocal = () => {
-  localStorage.removeItem(localStorageKey);
-};
+  localStorage.removeItem(localStorageKey)
+}
