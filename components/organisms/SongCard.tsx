@@ -26,10 +26,10 @@ const SongCard: FC<SongCardProps> = ({
     >
       <div className="w-28 h-20 relative overflow-hidden">
         {isPlaying && (
-          <div className="absolute w-full h-full grid place-items-center">
+          <div className="absolute w-full h-full grid place-items-center z-10">
             <IoPlay
               size={32}
-              className="animate-pulse duration-1000 text-[#f8f8f2]"
+              className="animate-pulse duration-1000 text-[#f8f8f2] text-opacity-80"
             />
           </div>
         )}
