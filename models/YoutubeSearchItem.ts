@@ -1,19 +1,19 @@
 interface YoutubeSearchItem {
   id: {
-    kind: string;
-    videoId: string;
-  };
+    kind: string
+    videoId: string
+  }
   snippet: {
-    title: string;
-    channelTitle: string;
+    title: string
+    channelTitle: string
     thumbnails: {
       high: {
-        url: string;
-        width: number;
-        height: number;
-      };
-    };
-  };
+        url: string
+        width: number
+        height: number
+      }
+    }
+  }
 }
 
-export default YoutubeSearchItem;
+export default YoutubeSearchItem

@@ -1,11 +1,11 @@
-import User from '../../models/user/User';
+import User from '../../models/user/User'
 
 export const getAvatarString = (user: User) => {
   if (user.name === '') {
-    return '-';
+    return '-'
   }
 
-  const idx = user.name.lastIndexOf(' ') || 0;
+  const idx = user.name.lastIndexOf(' ') || 0
 
-  return user.name.charAt(idx + 1).toUpperCase();
-};
+  return user.name.charAt(idx + 1).toUpperCase()
+}
