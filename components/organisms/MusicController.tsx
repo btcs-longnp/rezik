@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react'
 import {
   IoPause,
   IoPlay,
@@ -6,43 +6,43 @@ import {
   IoPlayForward,
   IoSync,
   IoTrashBin,
-} from 'react-icons/io5';
-import { useRecoilState } from 'recoil';
-import { isPlayingStore } from '../../stores/player';
-import IconButton from '../atoms/IconButton';
+} from 'react-icons/io5'
+import { useRecoilState } from 'recoil'
+import { isPlayingStore } from '../../stores/player'
+import IconButton from '../atoms/IconButton'
 
 export interface MusicControllerOptions {
-  restrictPlayBtn?: boolean;
-  restrictOffSync?: boolean;
+  restrictPlayBtn?: boolean
+  restrictOffSync?: boolean
 }
 
 interface MusicControllerProps {
-  next: () => void;
-  previous: () => void;
-  shuffle: () => void;
-  setIsSync: (isSync: boolean) => void;
-  clearPlaylist: () => void;
-  options?: MusicControllerOptions;
+  next: () => void
+  previous: () => void
+  shuffle: () => void
+  setIsSync: (isSync: boolean) => void
+  clearPlaylist: () => void
+  options?: MusicControllerOptions
 }
 
 const MusicController: FC<MusicControllerProps> = (props) => {
-  const [isSync, setIsSync] = useState(true);
-  const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore);
+  const [isSync, setIsSync] = useState(true)
+  const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore)
 
   const handleToggleSync = () => {
-    setIsSync(!isSync);
-  };
+    setIsSync(!isSync)
+  }
 
   const handleTogglePlay = () => {
-    setIsPlaying((val) => !val);
-  };
+    setIsPlaying((val) => !val)
+  }
 
   useEffect(() => {
-    props.setIsSync(isSync);
-  }, [isSync, props]);
+    props.setIsSync(isSync)
+  }, [isSync, props])
 
   return (
-    <div className='flex justify-around items-center rounded-full px-3 py-2 bg-opacity-80 bg-primary-light hover:bg-opacity-95 transition-all duration-300'>
+    <div className="flex justify-around items-center rounded-full px-3 py-2 bg-opacity-80 bg-primary-light hover:bg-opacity-95 transition-all duration-300">
       <IconButton onClick={props.previous}>
         <IoPlayBack />
       </IconButton>
@@ -60,10 +60,10 @@ const MusicController: FC<MusicControllerProps> = (props) => {
         </IconButton>
       )}
       <IconButton onClick={props.clearPlaylist}>
-        <IoTrashBin className='text-rose-400' />
+        <IoTrashBin className="text-rose-400" />
       </IconButton>
     </div>
-  );
-};
+  )
+}
 
-export default MusicController;
+export default MusicController

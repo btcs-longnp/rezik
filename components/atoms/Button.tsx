@@ -1,17 +1,18 @@
-import { FC, HTMLProps } from 'react';
+import { FC, HTMLProps } from 'react'
 
 export interface ButtonProps
   extends Omit<HTMLProps<HTMLButtonElement>, 'size'> {
-  type?: 'primary' | 'text' | 'default';
-  size?: 'small' | 'medium' | 'large';
-  component?: 'link' | 'button' | 'nextLink';
-  href?: string;
-  target?: '_blank' | '_self';
+  type?: 'primary' | 'text' | 'default'
+  size?: 'small' | 'medium' | 'large'
+  component?: 'link' | 'button' | 'nextLink'
+  href?: string
+  target?: '_blank' | '_self'
 }
 
 const Button: FC<ButtonProps> = (props) => {
   const btn = (
     <button
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       {...(props as any)}
       className={`
     ${props.className}
@@ -39,7 +40,7 @@ const Button: FC<ButtonProps> = (props) => {
     >
       {props.children}
     </button>
-  );
+  )
 
   return props.component === 'link' ? (
     <a href={props.href} target={props.target}>
@@ -47,7 +48,7 @@ const Button: FC<ButtonProps> = (props) => {
     </a>
   ) : (
     btn
-  );
-};
+  )
+}
 
-export default Button;
+export default Button

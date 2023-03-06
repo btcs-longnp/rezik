@@ -1,23 +1,24 @@
-import { FC, HTMLProps, useState } from 'react';
-import { IoCheckmarkCircle, IoCopy } from 'react-icons/io5';
+import { FC, HTMLProps, useState } from 'react'
+import { IoCheckmarkCircle, IoCopy } from 'react-icons/io5'
 
 export interface CopyButtonProps extends HTMLProps<HTMLButtonElement> {
-  content: string;
-  className?: string;
+  content: string
+  className?: string
 }
 
 const CopyButton: FC<CopyButtonProps> = ({ content, className, ...props }) => {
-  const [isCopyDone, setIsCopyDone] = useState(false);
+  const [isCopyDone, setIsCopyDone] = useState(false)
 
   const copyIdToClipboard = () => {
-    navigator.clipboard.writeText(content);
-    setIsCopyDone(true);
+    navigator.clipboard.writeText(content)
+    setIsCopyDone(true)
     setTimeout(() => {
-      setIsCopyDone(false);
-    }, 1000);
-  };
+      setIsCopyDone(false)
+    }, 1000)
+  }
 
   return (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     <button {...(props as any)} onClick={copyIdToClipboard}>
       {isCopyDone ? (
         <IoCheckmarkCircle className={`${className} text-green-700`} />
@@ -27,7 +28,7 @@ const CopyButton: FC<CopyButtonProps> = ({ content, className, ...props }) => {
         />
       )}
     </button>
-  );
-};
+  )
+}
 
-export default CopyButton;
+export default CopyButton

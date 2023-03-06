@@ -1,52 +1,52 @@
-import EventEmitter from 'events';
-import { FC, ReactElement, useCallback, useEffect, useState } from 'react';
-import { IoClose } from 'react-icons/io5';
-import IconButton from './IconButton';
+import EventEmitter from 'events'
+import { FC, ReactElement, useCallback, useEffect, useState } from 'react'
+import { IoClose } from 'react-icons/io5'
+import IconButton from './IconButton'
 
-const eventEmitter = new EventEmitter();
+const eventEmitter = new EventEmitter()
 
-let modalBody: ReactElement = <></>;
+let modalBody: ReactElement = <></>
 
 export interface OpenModalOptions {
-  body: ReactElement;
+  body: ReactElement
 }
 
 export const openModal = (options: OpenModalOptions) => {
-  modalBody = options.body;
-  eventEmitter.emit('openModal');
-};
+  modalBody = options.body
+  eventEmitter.emit('openModal')
+}
 
 export const closeModal = () => {
-  eventEmitter.emit('closeModal');
-};
+  eventEmitter.emit('closeModal')
+}
 
 const Modal: FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [_, setForceUpdate] = useState(true);
+  const [isOpen, setIsOpen] = useState(false)
+  const [, setForceUpdate] = useState(true)
 
   const closeModal = useCallback(() => {
-    modalBody = <></>;
-    setIsOpen(false);
-  }, []);
+    modalBody = <></>
+    setIsOpen(false)
+  }, [])
 
   useEffect(() => {
     eventEmitter.on('openModal', () => {
       if (isOpen) {
-        setForceUpdate((val) => !val);
+        setForceUpdate((val) => !val)
       }
 
-      setIsOpen(true);
-    });
+      setIsOpen(true)
+    })
 
     eventEmitter.on('closeModal', () => {
-      closeModal();
-    });
+      closeModal()
+    })
 
     return () => {
-      eventEmitter.removeAllListeners('openModal');
-      eventEmitter.removeAllListeners('closeModal');
-    };
-  }, [isOpen, closeModal]);
+      eventEmitter.removeAllListeners('openModal')
+      eventEmitter.removeAllListeners('closeModal')
+    }
+  }, [isOpen, closeModal])
 
   return (
     <div
@@ -58,16 +58,16 @@ const Modal: FC = () => {
         ${isOpen ? 'block' : 'hidden'}
       `}
     >
-      <div className='relative w-full'>
-        <div className='absolute top-2 right-2 z-20'>
+      <div className="relative w-full">
+        <div className="absolute top-2 right-2 z-20">
           <IconButton onClick={closeModal}>
-            <IoClose className='text-secondary' />
+            <IoClose className="text-secondary" />
           </IconButton>
         </div>
         {modalBody}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Modal;
+export default Modal
