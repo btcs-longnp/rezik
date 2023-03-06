@@ -24,7 +24,7 @@ const SongCard: FC<SongCardProps> = ({
         isPlaying ? 'bg-rose-400 bg-opacity-75' : ''
       }`}
     >
-      <div className="w-28 h-20 relative">
+      <div className="w-28 h-20 relative overflow-hidden">
         {isPlaying && (
           <div className="absolute w-full h-full grid place-items-center">
             <IoPlay
@@ -36,7 +36,7 @@ const SongCard: FC<SongCardProps> = ({
         <img
           src={songRequest.song.thumbnail}
           alt=""
-          className="object-cover w-full h-full"
+          className="object-cover w-full h-full scale-[1.4]"
         />
       </div>
       <div className="pl-2 text-[#f8f8f2] h-full relative">

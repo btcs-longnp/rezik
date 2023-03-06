@@ -31,10 +31,10 @@ const playlistRepo = new PlaylistRepository('isling')
 const playlistStateRepo = new PlayerStateRepository('isling')
 
 const defaultSong = newYoutubeSong(
-  'dQw4w9WgXcQ',
-  'Never Gonna Give You Up',
-  'https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-  300
+  'IOe0tNoUGv8',
+  'EM ĐỒNG Ý (I DO) - ĐỨC PHÚC x 911 x KHẮC HƯNG',
+  'https://i.ytimg.com/vi/IOe0tNoUGv8/hqdefault.jpg',
+  222
 )
 
 const defaultSongReq = newSongRequest(
@@ -79,6 +79,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   const previous = () => {
     songReqIndex.current = Math.max(0, songReqIndex.current - 1)
+
+    if (!playlist.list[songReqIndex.current]) {
+      return;
+    }
+
     setCurSongReq(playlist.list[songReqIndex.current])
   }
 
