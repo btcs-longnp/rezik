@@ -81,7 +81,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     songReqIndex.current = Math.max(0, songReqIndex.current - 1)
 
     if (!playlist.list[songReqIndex.current]) {
-      return;
+      return
     }
 
     setCurSongReq(playlist.list[songReqIndex.current])
