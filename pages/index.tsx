@@ -54,13 +54,13 @@ const Player: NextPage = () => {
       </Head>
       <main>
         <div className="relative bg-primary">
-          <header className="fixed h-14 top-0 left-0 px-6 w-full bg-primary z-40">
+          <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
             <Header />
           </header>
-          <div className="grid grid-cols-[1fr_auto] px-6 space-x-6 h-screen overflow-auto">
-            <div>
-              <div className="h-16"></div>
-              <div className="overflow-hidden rounded-xl h-[calc(100vh-5.5rem)]">
+          <div className="relative lg:static lg:grid lg:grid-cols-[1fr_auto] lg:px-6 lg:space-x-6 h-screen overflow-auto">
+            <div className="fixed lg:static top-0 left-0 z-30 w-full">
+              <div className="lg:h-16" />
+              <div className="overflow-hidden lg:rounded-xl aspect-[3/2] lg:aspect-auto lg:h-[calc(100vh-5.5rem)]">
                 {curSongReq ? (
                   <ReactPlayer
                     ref={player}
@@ -86,9 +86,9 @@ const Player: NextPage = () => {
                 )}
               </div>
             </div>
-            <div className="grid grid-rows-[auto_1fr] w-[26rem]">
-              <div className="h-16"></div>
-              <div className="overflow-hidden rounded-xl h-[calc(100vh-5.5rem)]">
+            <div className="lg:w-[26rem]">
+              <div className="h-[calc(100vw*2/3)] lg:h-16" />
+              <div className="overflow-hidden lg:rounded-xl lg:h-[calc(100vh-5.5rem)]">
                 <PlaylistBox onSongReqChange={setCurSongReq} />
               </div>
             </div>

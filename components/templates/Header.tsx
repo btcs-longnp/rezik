@@ -120,7 +120,7 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
           </span>
         </div>
       </div>
-      <div className="flex items-center h-full space-x-6">
+      <div className="flex items-center h-full space-x-3 lg:space-x-6">
         {page === 'player' ? (
           <Button
             component="link"
