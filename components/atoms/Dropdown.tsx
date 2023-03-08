@@ -7,7 +7,7 @@ export interface DropdownProps {
 const Dropdown: FC<PropsWithChildren<DropdownProps>> = (props) => {
   return (
     <div className="relative group">
-      <div className="absolute top-full right-0 hidden group-hover:block pt-2">
+      <div className="absolute top-full -right-2 hidden group-hover:block pt-2">
         {props.menu}
       </div>
       {props.children}

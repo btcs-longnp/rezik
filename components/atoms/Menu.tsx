@@ -4,7 +4,7 @@ export const MenuItem: FC<HTMLProps<HTMLDivElement>> = (props) => {
   return (
     <div
       {...props}
-      className={`${props.className} py-2 px-3 hover:bg-primary/30 active:bg-primary/50 cursor-pointer rounded`}
+      className={`${props.className} py-3 px-3 hover:bg-primary/30 active:bg-primary/50 cursor-pointer rounded`}
     >
       {props.children}
     </div>
