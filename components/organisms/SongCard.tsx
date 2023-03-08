@@ -45,7 +45,7 @@ const SongCard: FC<SongCardProps> = ({
     <div
       id={songRequest.id}
       ref={songCardRef}
-      className={`grid grid-cols-[auto_1fr] group rounded overflow-hidden hover:bg-white/30 ${
+      className={`grid grid-cols-[auto_1fr] group rounded-md overflow-hidden hover:bg-white/30 ${
         isPlaying ? 'bg-rose-400 bg-opacity-75' : ''
       }`}
     >

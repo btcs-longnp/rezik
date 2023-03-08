@@ -1,12 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-  useRef,
-  useEffect,
-  useState,
-  FC,
-  useCallback,
-  ReactElement,
-} from 'react'
+import { useRef, useEffect, useState, FC, useCallback } from 'react'
 
 import { newYoutubeSong } from '../../../models/song/YoutubeSong'
 import PlaylistRepository from '../../../services/firestore/PlaylistRepository'
@@ -46,13 +39,11 @@ const defaultSongReq = newSongRequest(
 export interface PlaylistBoxProps {
   onSongReqChange?: (songReq: SongRequest) => void
   musicControllerOptions?: MusicControllerOptions
-  header: ReactElement
 }
 
 const PlaylistBox: FC<PlaylistBoxProps> = ({
   onSongReqChange,
   musicControllerOptions,
-  header,
 }) => {
   const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0))
   const [playerState, setPlayerState] = useState<PlayerState>(
@@ -227,7 +218,14 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     }
 
     scrollRef.current.scrollTo({
-      top: Math.max(songCardRef.offsetTop - topBarPlaceholderHeight - 8, 0),
+      top: Math.max(
+        songCardRef.offsetTop -
+          topBarPlaceholderHeight -
+          8 -
+          scrollRef.current.clientHeight / 2 +
+          2 * songCardRef.clientHeight,
+        0
+      ),
       behavior: 'smooth',
     })
   }, [curSongReq])
@@ -290,39 +288,37 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   }, [])
 
   return (
-    <div className="relative w-96 h-full">
-      <div className="absolute w-full h-full blur-3xl z-10">
+    <div className="relative w-full h-full overflow-hidden">
+      <div className="absolute w-full h-full blur-3xl z-10 bg-primary">
         <img
           src={curSongReq.song.thumbnail}
           alt=""
-          className="object-cover h-full w-full"
+          className="object-cover h-full w-full opacity-80"
         />
       </div>
-      <div className="relative w-full h-full z-20 px-2 backdrop-blur-xl">
+      <div className="relative w-full h-full z-20 pl-2 lg:pl-4 backdrop-blur-xl">
         <div
           ref={scrollRef}
-          className="overflow-y-auto space-y-2 h-full"
+          className="overflow-y-auto space-y-2 lg:space-y-3 h-full"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-10" id="top-bar-placeholder" />
+          <div className="h-1 lg:h-2" id="top-bar-placeholder" />
           {playlist.list.map((songReq) => (
-            <SongCard
-              key={songReq.id}
-              songRequest={songReq}
-              isCurSong={curSongReq.id === songReq.id}
-              play={() => playBySongReqId(songReq.id)}
-              remove={() => removeSongRequest(songReq.id)}
-            />
+            <div className="pr-2 lg:pr-4" key={songReq.id}>
+              <SongCard
+                songRequest={songReq}
+                isCurSong={curSongReq.id === songReq.id}
+                play={() => playBySongReqId(songReq.id)}
+                remove={() => removeSongRequest(songReq.id)}
+              />
+            </div>
           ))}
-          <div className="h-[72px]" />
+          <div className="h-[80px] lg:h-[92px]" />
         </div>
       </div>
-      <div className="absolute top-0 left-0 h-10 w-full bg-primary-light/70 backdrop-blur z-40">
-        {header}
-      </div>
-      <div className="absolute bottom-0 w-full z-40 backdrop-blur-md">
-        <div className="relative p-2">
+      <div className="fixed lg:absolute bottom-0 w-full z-40 backdrop-blur-md">
+        <div className="relative p-2 lg:p-4">
           <MusicController
             next={next}
             previous={previous}
