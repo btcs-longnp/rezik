@@ -296,16 +296,16 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           className="object-cover h-full w-full opacity-80"
         />
       </div>
-      <div className="relative w-full h-full z-20 pl-4 backdrop-blur-xl">
+      <div className="relative w-full h-full z-20 pl-2 lg:pl-4 backdrop-blur-xl">
         <div
           ref={scrollRef}
-          className="overflow-y-auto space-y-3 h-full"
+          className="overflow-y-auto space-y-2 lg:space-y-3 h-full"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-2" id="top-bar-placeholder" />
+          <div className="h-1 lg:h-2" id="top-bar-placeholder" />
           {playlist.list.map((songReq) => (
-            <div className="pr-4" key={songReq.id}>
+            <div className="pr-2 lg:pr-4" key={songReq.id}>
               <SongCard
                 songRequest={songReq}
                 isCurSong={curSongReq.id === songReq.id}
@@ -314,14 +314,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
               />
             </div>
           ))}
-          <div className="h-[92px]" />
+          <div className="h-[80px] lg:h-[92px]" />
         </div>
       </div>
-      {/* <div className="absolute top-0 left-0 h-10 w-full bg-primary-light/70 backdrop-blur z-40">
-        {header}
-      </div> */}
-      <div className="absolute bottom-0 w-full z-40 backdrop-blur-md">
-        <div className="relative p-4">
+      <div className="fixed lg:absolute bottom-0 w-full z-40 backdrop-blur-md">
+        <div className="relative p-2 lg:p-4">
           <MusicController
             next={next}
             previous={previous}
