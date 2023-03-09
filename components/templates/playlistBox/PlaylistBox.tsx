@@ -293,7 +293,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
         <img
           src={curSongReq.song.thumbnail}
           alt=""
-          className="object-cover h-full w-full opacity-80"
+          className="object-cover h-full w-full opacity-80 scale-150"
         />
       </div>
       <div className="relative w-full h-full z-20 pl-2 lg:pl-4 backdrop-blur-xl">
