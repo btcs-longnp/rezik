@@ -293,7 +293,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
         <img
           src={curSongReq.song.thumbnail}
           alt=""
-          className="object-cover h-full w-full opacity-80 scale-150"
+          className="object-cover h-full w-full opacity-90 scale-150"
         />
       </div>
       <div className="relative w-full h-full z-20 pl-2 lg:pl-4 backdrop-blur-xl">
@@ -303,7 +303,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="h-1 lg:h-2" id="top-bar-placeholder" />
+          <div className="h-1" id="top-bar-placeholder" />
           {playlist.list.map((songReq) => (
             <div className="pr-2 lg:pr-4" key={songReq.id}>
               <SongCard
