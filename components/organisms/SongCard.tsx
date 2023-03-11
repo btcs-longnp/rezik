@@ -2,7 +2,6 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoPlay, IoTrash } from 'react-icons/io5'
 import SongRequest from '../../models/songRequest/SongRequest'
-import { unescape } from '../../services/utils/string'
 import IconButton from '../atoms/IconButton'
 
 export interface SongCardProps {
@@ -18,7 +17,7 @@ const SongCard: FC<SongCardProps> = ({
   play,
   remove,
 }) => {
-  const [songTitle, setSongTitle] = useState(unescape(songRequest.song.title))
+  const [songTitle, setSongTitle] = useState(songRequest.song.title)
   const songCardRef = useRef<HTMLDivElement>(null)
   const songTitleRef = useRef<HTMLDivElement>(null)
 
