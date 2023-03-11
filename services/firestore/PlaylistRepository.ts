@@ -10,6 +10,7 @@ import {
   Unsubscribe,
 } from 'firebase/firestore'
 import Playlist, { commitPlaylist } from '../../models/songRequest/Playlist'
+import { unescape } from '../utils/string'
 
 export type SnapshotPlaylistHandler = (playlist?: Playlist) => void
 
@@ -26,7 +27,21 @@ class PlaylistRepository {
 
   onSnapshotPlaylist(handler: SnapshotPlaylistHandler): Unsubscribe {
     const unsub = onSnapshot(doc(this.playlistCollection, 'default'), (doc) => {
-      handler(doc.data() as Playlist | undefined)
+      const playlist = doc.data() ? (doc.data() as Playlist) : undefined
+
+      if (playlist === undefined) {
+        handler(playlist)
+
+        return
+      }
+
+      playlist.list = playlist.list.map((item) => {
+        item.song.title = unescape(item.song.title)
+
+        return item
+      })
+
+      handler(playlist)
     })
 
     return unsub

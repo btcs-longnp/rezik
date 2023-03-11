@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef, useState } from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
@@ -10,13 +11,22 @@ import { useRecoilState } from 'recoil'
 import { isPlayingStore } from '../stores/player'
 import Header from '../components/templates/Header'
 import { IoPlay } from 'react-icons/io5'
+import ReactionPool from '../components/templates/ReactionPool'
+import { ReactionType } from '../models/Reaction'
+import { emitAddReaction } from '../services/emitter/reactionEmitter'
+import ReactionIcon from '../components/atoms/ReactionIcon'
+import PlayerStateRepository, {
+  SnapshotReactionHandler,
+} from '../services/firestore/PlayerStateRepository'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
+const playerRepo = new PlayerStateRepository('isling')
 
 const Player: NextPage = () => {
   const player = useRef<ReactPlayer>(null)
   const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore)
   const [curSongReq, setCurSongReq] = useState<SongRequest>()
+  const playerRef = useRef<HTMLDivElement>(null)
 
   const onReady = () => {
     console.log('player: onReady')
@@ -37,6 +47,10 @@ const Player: NextPage = () => {
     setIsPlaying(false)
   }
 
+  const handleReaction = (type: ReactionType) => () => {
+    playerRepo.reaction(type)
+  }
+
   useEffect(() => {
     if (!player.current) {
       return
@@ -44,6 +58,18 @@ const Player: NextPage = () => {
 
     player.current.seekTo(0)
   }, [curSongReq])
+
+  useEffect(() => {
+    const reactionHandler: SnapshotReactionHandler = (id, type) => {
+      emitAddReaction({ id, type })
+    }
+
+    const unsubReaction = playerRepo.onSnapshotReaction(reactionHandler)
+
+    return () => {
+      unsubReaction()
+    }
+  }, [])
 
   return (
     <div>
@@ -57,10 +83,14 @@ const Player: NextPage = () => {
           <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
             <Header />
           </header>
+          <ReactionPool elementRef={playerRef} />
           <div className="relative lg:static lg:grid lg:grid-cols-[1fr_auto] lg:px-6 lg:space-x-6 h-screen overflow-auto">
             <div className="fixed lg:static top-0 left-0 z-30 w-full">
               <div className="lg:h-16" />
-              <div className="overflow-hidden lg:rounded-xl aspect-[3/2] lg:aspect-auto lg:h-[calc(100vh-5.5rem)]">
+              <div
+                ref={playerRef}
+                className="overflow-hidden lg:rounded-xl aspect-[3/2] lg:aspect-video lg:w-full"
+              >
                 {curSongReq ? (
                   <ReactPlayer
                     ref={player}
@@ -84,6 +114,26 @@ const Player: NextPage = () => {
                     <div className="h-20 bg-black" />
                   </div>
                 )}
+              </div>
+              <div className="mt-4 text-md font-semibold text-secondary">
+                {curSongReq?.song.title}
+              </div>
+              <div className="grid grid-cols-[1fr_auto] text-secondary h-28">
+                <div className="mt-6 flex space-x-4" />
+                <div className="flex space-x-4 items-center">
+                  {['haha', 'heart', 'sad', 'surprise', 'angry'].map((type) => (
+                    <div
+                      key={type}
+                      onClick={handleReaction(type as ReactionType)}
+                      className="w-16 h-16 cursor-pointer hover:w-24 hover:h-24 transition-all duration-700 group"
+                    >
+                      <ReactionIcon
+                        type={type as ReactionType}
+                        className="group-active:scale-110 transition-all duration-100"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="lg:w-[26rem]">
