@@ -1,17 +1,17 @@
-interface YoutubeSong {
+interface Song {
   id: string
   title: string
   thumbnail: string
   duration?: number
 }
 
-export const newYoutubeSong = (
+export const newSong = (
   id: string,
   title: string,
   thumbnail: string,
-  duration?: number
-): YoutubeSong => {
-  const song: YoutubeSong = {
+  duration = 0
+): Song => {
+  const song: Song = {
     id,
     title,
     thumbnail,
@@ -21,4 +21,4 @@ export const newYoutubeSong = (
   return song
 }
 
-export default YoutubeSong
+export default Song

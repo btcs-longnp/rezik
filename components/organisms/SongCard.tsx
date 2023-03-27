@@ -34,6 +34,7 @@ const SongCard: FC<SongCardProps> = ({
         songTitle
           .slice(0, songTitle.length - 5)
           .trim()
+          // TODO: update regex replace non unicode character
           .replace(/[^A-Za-zÀ-ȕ0-9]$/gm, '')
           .concat('...')
       )
