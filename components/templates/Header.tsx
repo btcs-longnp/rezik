@@ -2,7 +2,6 @@ import { FC, useEffect, useState } from 'react'
 import {
   IoLogInOutline,
   IoLogOutOutline,
-  IoOpenOutline,
   IoPersonOutline,
   IoWarningOutline,
 } from 'react-icons/io5'
@@ -18,9 +17,10 @@ import { openModal } from '../atoms/Modal'
 import SignIn from './SignIn'
 import SignUpAndProfile from './SignUpAndProfile'
 import { getAvatarString } from '../../services/utils/user'
+import Link from 'next/link'
 
 export interface HeaderProps {
-  page?: 'player' | 'vote'
+  page?: 'player' | 'search'
 }
 
 const Header: FC<HeaderProps> = ({ page = 'player' }) => {
@@ -122,27 +122,17 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
       </div>
       <div className="flex items-center h-full space-x-3 lg:space-x-6">
         {page === 'player' ? (
-          <Button
-            component="link"
-            href="https://weplay.isling.me/"
-            target="_blank"
-            size="medium"
-            type="primary"
-          >
-            Add song
-            <IoOpenOutline className="ml-1" />
-          </Button>
+          <Link href="/search">
+            <Button size="medium" type="primary">
+              Add song
+            </Button>
+          </Link>
         ) : (
-          <Button
-            component="link"
-            href="/"
-            target="_blank"
-            size="medium"
-            type="primary"
-          >
-            Open Player
-            <IoOpenOutline className="ml-1" />
-          </Button>
+          <Link href="/">
+            <Button size="medium" type="primary">
+              Open Player
+            </Button>
+          </Link>
         )}
         <Dropdown menu={isAnonymousUser(currentUser) ? GuestMenu : UserMenu}>
           <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-light cursor-pointer">

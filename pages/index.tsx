@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef, useState } from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
@@ -21,6 +20,13 @@ import PlayerStateRepository, {
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const playerRepo = new PlayerStateRepository('isling')
+const listReaction: ReactionType[] = [
+  'haha',
+  'heart',
+  'sad',
+  'surprise',
+  'angry',
+]
 
 const Player: NextPage = () => {
   const player = useRef<ReactPlayer>(null)
@@ -89,7 +95,7 @@ const Player: NextPage = () => {
               <div className="lg:h-16" />
               <div
                 ref={playerRef}
-                className="overflow-hidden lg:rounded-xl aspect-[3/2] lg:aspect-video lg:w-full"
+                className="overflow-hidden lg:rounded-sm aspect-[3/2] lg:aspect-video lg:w-full"
               >
                 {curSongReq ? (
                   <ReactPlayer
@@ -115,17 +121,17 @@ const Player: NextPage = () => {
                   </div>
                 )}
               </div>
-              <div className="mt-4 text-md font-semibold text-secondary">
+              <div className="mt-3 text-xl text-secondary">
                 {curSongReq?.song.title}
               </div>
-              <div className="grid grid-cols-[1fr_auto] text-secondary h-28">
+              <div className="grid grid-cols-[1fr_auto] text-secondary h-16">
                 <div className="mt-6 flex space-x-4" />
                 <div className="flex space-x-4 items-center">
-                  {['haha', 'heart', 'sad', 'surprise', 'angry'].map((type) => (
+                  {listReaction.map((type) => (
                     <div
                       key={type}
                       onClick={handleReaction(type as ReactionType)}
-                      className="w-16 h-16 cursor-pointer hover:w-24 hover:h-24 transition-all duration-700 group"
+                      className="w-12 h-12 cursor-pointer hover:w-16 hover:h-16 transition-all duration-700 group"
                     >
                       <ReactionIcon
                         type={type as ReactionType}
