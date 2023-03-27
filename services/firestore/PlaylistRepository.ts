@@ -49,7 +49,9 @@ class PlaylistRepository {
 
   async setPlaylist(playlist: Playlist) {
     console.log('setPlaylist', playlist)
-    const docSnap = await getDoc(doc(this.playlistCollection, 'default'))
+    const defaultDoc = doc(this.playlistCollection, 'default')
+    const docSnap = await getDoc(defaultDoc)
+
     if (docSnap.exists()) {
       if (docSnap.data().version !== playlist.version) {
         console.log(
@@ -61,10 +63,7 @@ class PlaylistRepository {
       }
     }
 
-    return setDoc(
-      doc(this.playlistCollection, 'default'),
-      commitPlaylist(playlist)
-    )
+    await setDoc(defaultDoc, commitPlaylist(playlist))
   }
 
   async removePlaylist() {

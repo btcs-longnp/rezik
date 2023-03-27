@@ -1,16 +1,16 @@
 import { nanoid } from 'nanoid'
-import YoutubeSong from '../song/YoutubeSong'
+import Song from '../song/Song'
 import User from '../user/User'
 
 interface SongRequest {
   id: string
-  song: YoutubeSong
+  song: Song
   user: User
   requestTime: Date
 }
 
 export const newSongRequest = (
-  song: YoutubeSong,
+  song: Song,
   user: User,
   requestId?: string
 ): SongRequest => {

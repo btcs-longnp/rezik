@@ -1,7 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
-import { useRef, useEffect, useState, FC, useCallback } from 'react'
+import {
+  useRef,
+  useEffect,
+  useState,
+  FC,
+  useCallback,
+  ReactElement,
+} from 'react'
 
-import { newYoutubeSong } from '../../../models/song/YoutubeSong'
+import { newSong } from '../../../models/song/Song'
 import PlaylistRepository from '../../../services/firestore/PlaylistRepository'
 import Playlist, { newPlaylist } from '../../../models/songRequest/Playlist'
 import MusicController, {
@@ -19,11 +26,13 @@ import SongRequest, {
 } from '../../../models/songRequest/SongRequest'
 import { getAnonymousUser } from '../../../models/user/User'
 import { playerEvent } from '../../../models/eventEmitter/player'
+import { useRecoilState } from 'recoil'
+import { playlistStore } from '../../../stores/playlist'
 
 const playlistRepo = new PlaylistRepository('isling')
 const playlistStateRepo = new PlayerStateRepository('isling')
 
-const defaultSong = newYoutubeSong(
+const defaultSong = newSong(
   'IOe0tNoUGv8',
   'EM ĐỒNG Ý (I DO) - ĐỨC PHÚC x 911 x KHẮC HƯNG',
   'https://i.ytimg.com/vi/IOe0tNoUGv8/hqdefault.jpg',
@@ -39,13 +48,15 @@ const defaultSongReq = newSongRequest(
 export interface PlaylistBoxProps {
   onSongReqChange?: (songReq: SongRequest) => void
   musicControllerOptions?: MusicControllerOptions
+  miniPlayer?: ReactElement
 }
 
 const PlaylistBox: FC<PlaylistBoxProps> = ({
   onSongReqChange,
   musicControllerOptions,
+  miniPlayer,
 }) => {
-  const [playlist, setPlaylist] = useState<Playlist>(newPlaylist([], 0))
+  const [playlist, setPlaylist] = useRecoilState<Playlist>(playlistStore)
   const [playerState, setPlayerState] = useState<PlayerState>(
     newPlayerState(defaultSongReq, 0)
   )
@@ -217,13 +228,21 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
       return
     }
 
+    console.log(
+      songCardRef.offsetTop,
+      scrollRef.current.offsetTop,
+      topBarPlaceholderHeight,
+      scrollRef.current.clientHeight
+    )
+
     scrollRef.current.scrollTo({
       top: Math.max(
         songCardRef.offsetTop -
+          scrollRef.current.offsetTop -
           topBarPlaceholderHeight -
           8 -
           scrollRef.current.clientHeight / 2 +
-          2 * songCardRef.clientHeight,
+          1.5 * songCardRef.clientHeight,
         0
       ),
       behavior: 'smooth',
@@ -241,7 +260,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     return () => {
       unsubPlaylist()
     }
-  }, [])
+  }, [setPlaylist])
 
   useEffect(() => {
     if (!isSync) {
@@ -296,16 +315,17 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           className="object-cover h-full w-full opacity-90 scale-150"
         />
       </div>
-      <div className="relative w-full h-full z-20 pl-2 lg:pl-4 backdrop-blur-xl">
+      <div className="relative grid grid-rows-[auto_1fr] w-full h-full z-20 backdrop-blur-xl">
+        <div>{miniPlayer}</div>
         <div
           ref={scrollRef}
-          className="overflow-y-auto space-y-2 lg:space-y-3 h-full"
+          className="overflow-y-auto space-y-2 lg:space-y-3"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           <div className="h-1" id="top-bar-placeholder" />
           {playlist.list.map((songReq) => (
-            <div className="pr-2 lg:pr-4" key={songReq.id}>
+            <div className="px-2 lg:px-4" key={songReq.id}>
               <SongCard
                 songRequest={songReq}
                 isCurSong={curSongReq.id === songReq.id}
@@ -317,7 +337,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           <div className="h-[80px] lg:h-[92px]" />
         </div>
       </div>
-      <div className="fixed lg:absolute bottom-0 w-full z-40 backdrop-blur-md">
+      <div className="fixed lg:absolute bottom-0 w-full z-30 backdrop-blur-md">
         <div className="relative p-2 lg:p-4">
           <MusicController
             next={next}
