@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { FC, useEffect, useRef, useState } from 'react'
+import { IoAdd, IoCheckmarkDone } from 'react-icons/io5'
 import Song from '../../models/song/Song'
 
 export interface SongCardProps {
@@ -10,6 +11,15 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
   const [songTitle, setSongTitle] = useState(song.title)
   const songCardRef = useRef<HTMLDivElement>(null)
   const songTitleRef = useRef<HTMLDivElement>(null)
+  const [isShowResponse, setIsShowResponse] = useState(false)
+
+  const handleClick = () => {
+    setIsShowResponse(true)
+
+    setTimeout(() => {
+      setIsShowResponse(false)
+    }, 1000)
+  }
 
   useEffect(() => {
     if (!songCardRef.current || !songTitleRef.current) {
@@ -33,11 +43,19 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
   return (
     <div
       ref={songCardRef}
-      className={`grid grid-cols-[auto_1fr] rounded-xl overflow-hidden text-secondary`}
+      className="grid grid-cols-[auto_1fr] rounded-xl overflow-hidden text-secondary group"
+      onClick={handleClick}
     >
       <div className="w-80 aspect-[16/10] relative overflow-hidden rounded-xl">
         <div className="absolute bottom-2 right-2 px-1 py-0.5 z-10 bg-black rounded text-xs font-semibold">
           4:30
+        </div>
+        <div className="absolute bg-green-700/20 w-full h-full z-20 grid place-items-center transition-all duration-75 invisible group-hover:visible">
+          {isShowResponse ? (
+            <IoCheckmarkDone className="text-5xl" />
+          ) : (
+            <IoAdd className="text-5xl" />
+          )}
         </div>
         <img
           src={song.thumbnail}

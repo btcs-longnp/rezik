@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import {
   IoLogInOutline,
   IoLogOutOutline,
+  IoOpenOutline,
   IoPersonOutline,
   IoWarningOutline,
 } from 'react-icons/io5'
@@ -122,9 +123,10 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
       </div>
       <div className="flex items-center h-full space-x-3 lg:space-x-6">
         {page === 'player' ? (
-          <Link href="/search">
-            <Button size="medium" type="primary">
+          <Link href="/search" target="_blank">
+            <Button size="medium" type="primary" className="flex items-center">
               Add song
+              <IoOpenOutline className="ml-2" />
             </Button>
           </Link>
         ) : (

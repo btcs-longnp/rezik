@@ -304,7 +304,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
       <div className="absolute w-full h-full blur-3xl z-10 bg-primary">
         <img
           src={curSongReq.song.thumbnail}
-          alt=""
+          alt={curSongReq.song.title}
           className="object-cover h-full w-full opacity-90 scale-150"
         />
       </div>
@@ -327,7 +327,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
               />
             </div>
           ))}
-          <div className="h-[80px] lg:h-[92px]" />
+          <div className="h-[80px] lg:h-[80px]" />
         </div>
       </div>
       <div className="fixed lg:absolute bottom-0 w-full z-30 backdrop-blur-md">
