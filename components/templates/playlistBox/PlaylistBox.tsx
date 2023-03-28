@@ -29,8 +29,9 @@ import { playerEvent } from '../../../models/eventEmitter/player'
 import { useRecoilState } from 'recoil'
 import { playlistStore } from '../../../stores/playlist'
 
-const playlistRepo = new PlaylistRepository('isling')
-const playlistStateRepo = new PlayerStateRepository('isling')
+const roomId = 'isling'
+const playlistRepo = new PlaylistRepository(roomId)
+const playlistStateRepo = new PlayerStateRepository(roomId)
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -65,6 +66,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const songReqIndex = useRef(0)
   const songReqTotal = useRef(0)
   const syncFirstTimeDone = useRef(false)
+  const loadPlaylistFirstTimeDone = useRef(false)
   const shadowPlayerState = useRef(playerState)
   const shadowIsSync = useRef(isSync)
   const isMouseEnterPlaylist = useRef(false)
@@ -132,27 +134,20 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     alert('Clear playlist successfully')
   }
 
-  const shufflePlaylist = async () => {
-    const list = [...playlist.list]
-    const shuffleList = list.sort(() => Math.random() - 0.5)
-
-    const theNewPlaylist = newPlaylist(shuffleList, playlist.version)
-    await playlistRepo.setPlaylist(theNewPlaylist)
-    songReqIndex.current = 0
-    setCurSongReq(shuffleList[songReqIndex.current])
-  }
-
   const handleMouseEnter = () => {
-    console.log('### mouse enter playlist')
     isMouseEnterPlaylist.current = true
   }
 
   const handleMouseLeave = () => {
-    console.log('### mouse out')
     isMouseEnterPlaylist.current = false
   }
 
   useEffect(() => {
+    // do nothing if both playlist and playerState have not loaded
+    if (!loadPlaylistFirstTimeDone.current || !syncFirstTimeDone.current) {
+      return
+    }
+
     if (playlist.list.length === 0) {
       setCurSongReq(defaultSongReq)
       songReqIndex.current = 0
@@ -228,13 +223,6 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
       return
     }
 
-    console.log(
-      songCardRef.offsetTop,
-      scrollRef.current.offsetTop,
-      topBarPlaceholderHeight,
-      scrollRef.current.clientHeight
-    )
-
     scrollRef.current.scrollTo({
       top: Math.max(
         songCardRef.offsetTop -
@@ -251,8 +239,13 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   useEffect(() => {
     const unsubPlaylist = playlistRepo.onSnapshotPlaylist((playlist) => {
+      loadPlaylistFirstTimeDone.current = true
+
       console.log('player: playlist changed:', playlist)
-      if (!playlist) return
+      if (!playlist) {
+        setPlaylist(newPlaylist([], 0))
+        return
+      }
 
       setPlaylist(playlist)
     })
@@ -342,7 +335,6 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
           <MusicController
             next={next}
             previous={previous}
-            shuffle={shufflePlaylist}
             setIsSync={handleSetIsSync}
             clearPlaylist={clearPlaylist}
             options={musicControllerOptions}

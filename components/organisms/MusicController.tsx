@@ -19,7 +19,6 @@ export interface MusicControllerOptions {
 interface MusicControllerProps {
   next: () => void
   previous: () => void
-  shuffle: () => void
   setIsSync: (isSync: boolean) => void
   clearPlaylist: () => void
   options?: MusicControllerOptions
