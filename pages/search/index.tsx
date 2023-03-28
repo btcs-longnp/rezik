@@ -1,22 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import ReactPlayer from 'react-player'
 
-import SongRequest, {
-  newSongRequest,
-} from '../../models/songRequest/SongRequest'
+import { newSongRequest } from '../../models/songRequest/SongRequest'
 import PlaylistBox from '../../components/templates/playlistBox/PlaylistBox'
-// import { playerEvent } from '../../models/eventEmitter/player'
 import { useRecoilValue } from 'recoil'
-// import { isPlayingStore } from '../../stores/player'
 import Header from '../../components/templates/Header'
 import { IoClose } from 'react-icons/io5'
-// import ReactionPool from '../../components/templates/ReactionPool'
-// import { emitAddReaction } from '../../services/emitter/reactionEmitter'
-// import PlayerStateRepository, {
-//   SnapshotReactionHandler,
-// } from '../../services/firestore/PlayerStateRepository'
 import Song, { newSong } from '../../models/song/Song'
 import SongCardSimple from '../../components/organisms/SongCardSimple'
 import YoutubeSearchResult from '../../models/youtube/YoutubeSearchResult'
@@ -28,17 +18,11 @@ import PlaylistRepository from '../../services/firestore/PlaylistRepository'
 import IconButton from '../../components/atoms/IconButton'
 import { unescape } from '../../services/utils/string'
 
-// const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
-// const playerRepo = new PlayerStateRepository('isling')
 const playlistRepo = new PlaylistRepository('isling')
 
 const Player: NextPage = () => {
   const playlist = useRecoilValue(playlistStore)
-  const player = useRef<ReactPlayer>(null)
   const currentUser = useRecoilValue(currentUserStore)
-  // const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore)
-  const [curSongReq, setCurSongReq] = useState<SongRequest>()
-  // const playerRef = useRef<HTMLDivElement>(null)
   const [keyword, setKeyword] = useState<string>('')
   const keywordRef = useRef(keyword)
   const [youtubeVideos, setYoutubeVideos] = useState<YoutubeSearchResult[]>([])
@@ -99,73 +83,6 @@ const Player: NextPage = () => {
     await playlistRepo.setPlaylist(newPlaylist)
   }
 
-  // const onReady = () => {
-  //   console.log('player: onReady')
-  //   setIsPlaying(true)
-  // }
-
-  // const handleVideoEndOrError = () => {
-  //   playerEvent.emit('ended')
-  // }
-
-  // const onPlay = () => {
-  //   console.log('onPlay')
-  //   setIsPlaying(true)
-  // }
-
-  // const onPause = () => {
-  //   console.log('onPause')
-  //   setIsPlaying(false)
-  // }
-
-  // const miniPlayer = (
-  //   <div ref={playerRef} className="overflow-hidden lg:w-full lg:aspect-video">
-  //     {curSongReq ? (
-  //       <ReactPlayer
-  //         ref={player}
-  //         url={youtubeVideoBaseUrl + curSongReq.song.id}
-  //         playing={isPlaying}
-  //         controls={true}
-  //         onPlay={onPlay}
-  //         onPause={onPause}
-  //         onEnded={handleVideoEndOrError}
-  //         onError={handleVideoEndOrError}
-  //         onReady={onReady}
-  //         width="100%"
-  //         height="100%"
-  //       />
-  //     ) : (
-  //       <div className="h-full grid grid-rows-[auto_1fr_auto]">
-  //         <div className="h-20 bg-black" />
-  //         <div className="h-full bg-gray-400 grid place-items-center">
-  //           <IoPlay className="text-9xl text-primary-light animate-pulse duration-300" />
-  //         </div>
-  //         <div className="h-20 bg-black" />
-  //       </div>
-  //     )}
-  //   </div>
-  // )
-
-  useEffect(() => {
-    if (!player.current) {
-      return
-    }
-
-    player.current.seekTo(0)
-  }, [curSongReq])
-
-  // useEffect(() => {
-  //   const reactionHandler: SnapshotReactionHandler = (id, type) => {
-  //     emitAddReaction({ id, type })
-  //   }
-
-  //   const unsubReaction = playerRepo.onSnapshotReaction(reactionHandler)
-
-  //   return () => {
-  //     unsubReaction()
-  //   }
-  // }, [])
-
   return (
     <div>
       <Head>
@@ -196,12 +113,8 @@ const Player: NextPage = () => {
             <Header page="search" />
           </header>
           <div className="fixed top-16 right-6 overflow-hidden lg:rounded-xl lg:h-[calc(100vh-5.5rem)] lg:w-[26rem]">
-            <PlaylistBox
-              onSongReqChange={setCurSongReq}
-              // miniPlayer={miniPlayer}
-            />
+            <PlaylistBox />
           </div>
-          {/* <ReactionPool elementRef={playerRef} /> */}
           <div className="pl-6 pr-[32rem] overflow-auto">
             <div className="lg:h-20" />
             <div className=" space-y-4">
