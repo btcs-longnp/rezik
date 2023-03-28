@@ -92,7 +92,7 @@ const Player: NextPage = () => {
           <ReactionPool elementRef={playerRef} />
           <div className="relative lg:static lg:grid lg:grid-cols-[1fr_auto] lg:px-6 lg:space-x-6 h-screen overflow-auto">
             <div className="fixed lg:static top-0 left-0 z-30 w-full">
-              <div className="lg:h-16" />
+              <div className="lg:h-[4.5rem]" />
               <div
                 ref={playerRef}
                 className="overflow-hidden lg:rounded-sm aspect-[3/2] lg:aspect-video lg:w-full"
@@ -143,8 +143,8 @@ const Player: NextPage = () => {
               </div>
             </div>
             <div className="lg:w-[26rem]">
-              <div className="h-[calc(100vw*2/3)] lg:h-16" />
-              <div className="overflow-hidden lg:rounded-xl lg:h-[calc(100vh-5.5rem)]">
+              <div className="h-[calc(100vw*2/3)] lg:h-[4.5rem]" />
+              <div className="overflow-hidden lg:rounded-xl lg:h-[calc(100vh-6rem)]">
                 <PlaylistBox onSongReqChange={setCurSongReq} />
               </div>
             </div>

@@ -19,6 +19,13 @@ import IconButton from '../../components/atoms/IconButton'
 import { unescape } from '../../services/utils/string'
 
 const playlistRepo = new PlaylistRepository('isling')
+const youtubeApiKeys = [
+  'AIzaSyAXv-GO7k26oh9mXoWr_UjGM3SppWu15Z8', // btc-studio
+  'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY', // persuasive-zoo-235913
+  'AIzaSyCQ6SLch_P1nfZSssYe74P2M3a5YHrbais', // isling-m3
+]
+const randomApiKey = () =>
+  youtubeApiKeys[Math.round(Math.random() * (youtubeApiKeys.length - 1))]
 
 const Player: NextPage = () => {
   const playlist = useRecoilValue(playlistStore)
@@ -46,7 +53,7 @@ const Player: NextPage = () => {
         order: 'relevance',
         q: keywordRef.current,
         type: 'video',
-        key: 'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY',
+        key: randomApiKey(),
       },
     }).then((response) => {
       response.data.items.forEach((item: YoutubeSearchResult) => {
@@ -93,18 +100,17 @@ const Player: NextPage = () => {
       <main>
         <div className="relative bg-primary">
           <div className="fixed z-[999] left-1/2 -translate-x-1/2 h-14 flex justify-center items-center text-secondary">
-            <div className="w-[34rem] rounded-full border border-primary-light pl-4 pr-2 flex items-center">
+            <div className="w-[34rem] rounded-full border border-primary-light flex items-center pr-2">
               <input
                 ref={searchInputRef}
-                autoFocus
                 value={keyword}
-                placeholder="Search video by name or Youtube URL"
-                className="px-2 py-2 w-full outline-none bg-transparent flex-1"
+                placeholder="Search or type Youtube URL"
+                className="w-full pl-4 py-2 outline-none bg-transparent font-light"
                 onChange={({ target: { value } }) => handleChangeKeyword(value)}
               />
               {keyword.length > 0 && (
                 <IconButton onClick={handleClearKeyword}>
-                  <IoClose className="text-secondary/50 hover:text-secondary" />
+                  <IoClose className="text-secondary/50 hover:text-secondary text-lg" />
                 </IconButton>
               )}
             </div>
@@ -112,11 +118,11 @@ const Player: NextPage = () => {
           <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
             <Header page="search" />
           </header>
-          <div className="fixed top-16 right-6 overflow-hidden lg:rounded-xl lg:h-[calc(100vh-5.5rem)] lg:w-[26rem]">
+          <div className="fixed top-[4.5rem] right-6 overflow-hidden lg:rounded-xl lg:h-[calc(100vh-6rem)] lg:w-[26rem]">
             <PlaylistBox />
           </div>
           <div className="pl-6 pr-[32rem] overflow-auto">
-            <div className="lg:h-20" />
+            <div className="lg:h-[4.5rem]" />
             <div className=" space-y-4">
               {youtubeVideos.map((video) => (
                 <div
