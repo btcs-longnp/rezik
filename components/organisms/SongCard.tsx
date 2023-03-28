@@ -2,6 +2,7 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoPlay, IoTrash } from 'react-icons/io5'
 import SongRequest from '../../models/songRequest/SongRequest'
+import { truncateWithEllipsis } from '../../services/utils/string'
 import IconButton from '../atoms/IconButton'
 
 export interface SongCardProps {
@@ -30,14 +31,7 @@ const SongCard: FC<SongCardProps> = ({
     const cardHeight = songCardRef.current.clientHeight
 
     if (titleHeight > cardHeight / 2) {
-      setSongTitle(
-        songTitle
-          .slice(0, songTitle.length - 5)
-          .trim()
-          // TODO: update regex replace non unicode character
-          .replace(/[^A-Za-zÀ-ȕ0-9]$/gm, '')
-          .concat('...')
-      )
+      setSongTitle(truncateWithEllipsis(songTitle, songTitle.length - 5))
     }
   }, [songTitle])
 
@@ -50,6 +44,9 @@ const SongCard: FC<SongCardProps> = ({
       }`}
     >
       <div className="w-28 h-20 relative overflow-hidden">
+        <div className="absolute bottom-1 right-1 text-xs font-light bg-black/60 rounded-sm p-0.5 z-10">
+          {songRequest.song.duration}
+        </div>
         {isPlaying && (
           <div className="absolute w-full h-full grid place-items-center z-10">
             <IoPlay
@@ -60,7 +57,7 @@ const SongCard: FC<SongCardProps> = ({
         )}
         <img
           src={songRequest.song.thumbnail}
-          alt=""
+          alt={songRequest.song.title}
           className="object-cover w-full h-full scale-[1.4]"
         />
       </div>

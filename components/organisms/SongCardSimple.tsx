@@ -2,6 +2,7 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoAdd, IoCheckmarkDone } from 'react-icons/io5'
 import Song from '../../models/song/Song'
+import { truncateWithEllipsis } from '../../services/utils/string'
 
 export interface SongCardProps {
   song: Song
@@ -30,13 +31,7 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
     const cardHeight = songCardRef.current.clientHeight
 
     if (titleHeight > cardHeight / 2) {
-      setSongTitle(
-        songTitle
-          .slice(0, songTitle.length - 5)
-          .trim()
-          .replace(/[^A-Za-zÀ-ȕ0-9]$/gm, '')
-          .concat('...')
-      )
+      setSongTitle(truncateWithEllipsis(songTitle, songTitle.length - 5))
     }
   }, [songTitle])
 
@@ -47,8 +42,8 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
       onClick={handleClick}
     >
       <div className="w-80 aspect-[16/10] relative overflow-hidden rounded-xl">
-        <div className="absolute bottom-2 right-2 px-1 py-0.5 z-10 bg-black rounded text-xs font-semibold">
-          4:30
+        <div className="absolute bottom-2 right-2 px-1 py-0.5 z-10 bg-black/60 rounded text-xs font-semibold">
+          {song.duration}
         </div>
         <div className="absolute bg-green-700/20 w-full h-full z-20 grid place-items-center transition-all duration-75 invisible group-hover:visible">
           {isShowResponse ? (
@@ -65,7 +60,13 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
       </div>
       <div className="pl-4 h-full relative">
         <div ref={songTitleRef} className="font-light text-lg">
-          {songTitle}
+          {truncateWithEllipsis(songTitle, 150)}
+        </div>
+        <div className="font-light text-sm text-secondary/50 mt-3">
+          {truncateWithEllipsis(song.channelTitle, 50)}
+        </div>
+        <div className="font-light text-xs text-secondary/50 mt-3">
+          {truncateWithEllipsis(song.description, 90)}
         </div>
       </div>
     </div>

@@ -7,61 +7,57 @@ import PlaylistBox from '../../components/templates/playlistBox/PlaylistBox'
 import { useRecoilValue } from 'recoil'
 import Header from '../../components/templates/Header'
 import { IoClose } from 'react-icons/io5'
-import Song, { newSong } from '../../models/song/Song'
+import Song, { fromYoutubeVideo } from '../../models/song/Song'
 import SongCardSimple from '../../components/organisms/SongCardSimple'
-import YoutubeSearchResult from '../../models/youtube/YoutubeSearchResult'
-import axios from 'axios'
 import { playlistStore } from '../../stores/playlist'
 import { currentUserStore } from '../../stores/currentUser'
 import { pushSongRequest } from '../../models/songRequest/Playlist'
 import PlaylistRepository from '../../services/firestore/PlaylistRepository'
 import IconButton from '../../components/atoms/IconButton'
-import { unescape } from '../../services/utils/string'
+import {
+  getYoutubeVideos,
+  searchYoutubeVideo,
+} from '../../services/api/youtube'
+import { YouTubeVideo } from '../../models/youtube/YoutubeVideo'
 
 const playlistRepo = new PlaylistRepository('isling')
-const youtubeApiKeys = [
-  'AIzaSyAXv-GO7k26oh9mXoWr_UjGM3SppWu15Z8', // btc-studio
-  'AIzaSyCxMLRCWK7yQW2eH6E9xYZdFl-M4rylTAY', // persuasive-zoo-235913
-  'AIzaSyCQ6SLch_P1nfZSssYe74P2M3a5YHrbais', // isling-m3
-]
-const randomApiKey = () =>
-  youtubeApiKeys[Math.round(Math.random() * (youtubeApiKeys.length - 1))]
+const youtubeVideoURLRegex =
+  /^https:\/\/www.youtube.com\/watch\?v=(.*?)(?=&|$).*/
 
 const Player: NextPage = () => {
   const playlist = useRecoilValue(playlistStore)
   const currentUser = useRecoilValue(currentUserStore)
   const [keyword, setKeyword] = useState<string>('')
   const keywordRef = useRef(keyword)
-  const [youtubeVideos, setYoutubeVideos] = useState<YoutubeSearchResult[]>([])
+  const [youtubeVideos, setYoutubeVideos] = useState<YouTubeVideo[]>([])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const timeout = useRef<any>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const searchVideo = () => {
+  const searchVideo = async () => {
     if (keywordRef.current === '') {
       return
     }
 
     console.log('search youtube: ', keywordRef.current)
 
-    axios({
-      method: 'GET',
-      url: 'https://www.googleapis.com/youtube/v3/search',
-      params: {
-        part: 'snippet',
-        maxResults: 20,
-        order: 'relevance',
-        q: keywordRef.current,
-        type: 'video',
-        key: randomApiKey(),
-      },
-    }).then((response) => {
-      response.data.items.forEach((item: YoutubeSearchResult) => {
-        item.snippet.title = unescape(item.snippet.title)
-      })
+    const matchYtbUrl = keywordRef.current.match(youtubeVideoURLRegex)
 
-      setYoutubeVideos(response.data.items)
-    })
+    if (matchYtbUrl) {
+      const videos = await getYoutubeVideos(matchYtbUrl[1])
+
+      setYoutubeVideos(videos)
+
+      return
+    }
+
+    // Search by name
+    const results = await searchYoutubeVideo(keywordRef.current)
+    const videos = await getYoutubeVideos(
+      results.map((item) => item.id.videoId).join(',')
+    )
+
+    setYoutubeVideos(videos)
   }
 
   const handleChangeKeyword = (value: string) => {
@@ -127,22 +123,10 @@ const Player: NextPage = () => {
               {youtubeVideos.map((video) => (
                 <div
                   className="cursor-pointer"
-                  key={video.id.videoId}
-                  onClick={addSongRequest(
-                    newSong(
-                      video.id.videoId,
-                      video.snippet.title,
-                      video.snippet.thumbnails.high.url
-                    )
-                  )}
+                  key={video.id}
+                  onClick={addSongRequest(fromYoutubeVideo(video))}
                 >
-                  <SongCardSimple
-                    song={newSong(
-                      video.id.videoId,
-                      video.snippet.title,
-                      video.snippet.thumbnails.high.url
-                    )}
-                  />
+                  <SongCardSimple song={fromYoutubeVideo(video)} />
                 </div>
               ))}
             </div>

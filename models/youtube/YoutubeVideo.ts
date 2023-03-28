@@ -1,10 +1,8 @@
-interface YoutubeSearchItem {
-  id: {
-    kind: string
-    videoId: string
-  }
+export interface YouTubeVideo {
+  id: string
   snippet: {
     title: string
+    description: string
     channelTitle: string
     thumbnails: {
       high: {
@@ -14,6 +12,8 @@ interface YoutubeSearchItem {
       }
     }
   }
+  contentDetails: {
+    duration: string
+    aspectRatio: string
+  }
 }
-
-export default YoutubeSearchItem

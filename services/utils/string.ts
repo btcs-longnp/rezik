@@ -12,3 +12,15 @@ export const unescape = (str: string) => {
     (tag) => escapeMap[tag] || tag
   )
 }
+
+export const truncateWithEllipsis = (str: string, len: number) => {
+  if (str.length <= len) {
+    return str
+  }
+
+  return str
+    .slice(0, len)
+    .trim()
+    .replace(/[^A-Za-zÀ-ӿ0-9]$/gm, '')
+    .concat('...')
+}

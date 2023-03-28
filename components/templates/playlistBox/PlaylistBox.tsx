@@ -36,8 +36,10 @@ const playlistStateRepo = new PlayerStateRepository(roomId)
 const defaultSong = newSong(
   'IOe0tNoUGv8',
   'EM ĐỒNG Ý (I DO) - ĐỨC PHÚC x 911 x KHẮC HƯNG',
+  'EM ĐỒNG Ý',
   'https://i.ytimg.com/vi/IOe0tNoUGv8/hqdefault.jpg',
-  222
+  '4:30',
+  'ĐỨC PHÚC'
 )
 
 const defaultSongReq = newSongRequest(
