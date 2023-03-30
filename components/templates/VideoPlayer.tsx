@@ -61,7 +61,7 @@ const VideoPlayer = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       springCtrl: any,
       baseClass = 'fixed overflow-hidden w-full',
-      isUseTransition = true
+      isUseAnimation?: boolean
     ) => {
       const srcEle = document.getElementById(srcEleId)
 
@@ -75,6 +75,15 @@ const VideoPlayer = () => {
       }
 
       const srcEleRect = srcEle.getBoundingClientRect()
+      const distEleRect = distRef.getBoundingClientRect()
+      const totalDiffPos =
+        Math.abs(distEleRect.left - srcEleRect.left) +
+        Math.abs(distEleRect.top - srcEleRect.top)
+
+      const shouldUseAnimation =
+        typeof isUseAnimation !== 'undefined'
+          ? isUseAnimation
+          : totalDiffPos > 200
 
       const srcEleClass = Array.from(srcEle.classList)
         .filter((className) => {
@@ -96,7 +105,7 @@ const VideoPlayer = () => {
         zIndex: 40,
       }
 
-      if (isUseTransition) {
+      if (shouldUseAnimation) {
         springCtrl.start(newProps)
       } else {
         springCtrl.set(newProps)
@@ -126,13 +135,6 @@ const VideoPlayer = () => {
   }, [])
 
   useEffect(() => {
-    clonePositionAndClass(
-      playerRef.current,
-      'video-placeholder',
-      playerCtrl,
-      'fixed overflow-hidden w-full group'
-    )
-
     if (router.route === '/') {
       document.onscroll = () => {
         clonePositionAndClass(
@@ -151,8 +153,7 @@ const VideoPlayer = () => {
       playerRef.current,
       'video-placeholder',
       playerCtrl,
-      'fixed overflow-hidden w-full group',
-      false
+      'fixed overflow-hidden w-full group'
     )
   }, [clonePositionAndClass, playerCtrl])
 
