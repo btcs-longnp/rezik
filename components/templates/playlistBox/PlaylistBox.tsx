@@ -1,12 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-  useRef,
-  useEffect,
-  useState,
-  FC,
-  useCallback,
-  ReactElement,
-} from 'react'
+import { useRef, useEffect, useState, FC, useCallback } from 'react'
 
 import { newSong } from '../../../models/song/Song'
 import PlaylistRepository from '../../../services/firestore/PlaylistRepository'
@@ -28,6 +21,7 @@ import { getAnonymousUser } from '../../../models/user/User'
 import { playerEvent } from '../../../models/eventEmitter/player'
 import { useRecoilState } from 'recoil'
 import { playlistStore } from '../../../stores/playlist'
+import { curSongReqStore } from '../../../stores/player'
 
 const roomId = 'isling'
 const playlistRepo = new PlaylistRepository(roomId)
@@ -51,20 +45,20 @@ const defaultSongReq = newSongRequest(
 export interface PlaylistBoxProps {
   onSongReqChange?: (songReq: SongRequest) => void
   musicControllerOptions?: MusicControllerOptions
-  miniPlayer?: ReactElement
+  hasMiniPlayer?: boolean
 }
 
 const PlaylistBox: FC<PlaylistBoxProps> = ({
   onSongReqChange,
   musicControllerOptions,
-  miniPlayer,
+  hasMiniPlayer = false,
 }) => {
   const [playlist, setPlaylist] = useRecoilState<Playlist>(playlistStore)
   const [playerState, setPlayerState] = useState<PlayerState>(
     newPlayerState(defaultSongReq, 0)
   )
   const [isSync, setIsSync] = useState(true)
-  const [curSongReq, setCurSongReq] = useState<SongRequest>(defaultSongReq)
+  const [curSongReq, setCurSongReq] = useRecoilState(curSongReqStore)
   const songReqIndex = useRef(0)
   const songReqTotal = useRef(0)
   const syncFirstTimeDone = useRef(false)
@@ -102,7 +96,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
     songReqIndex.current += 1
     setCurSongReq(playlist.list[songReqIndex.current])
-  }, [playlist.list])
+  }, [playlist.list, setCurSongReq])
 
   const playBySongReqId = (songReqId: string) => {
     const idx = playlist.list.findIndex((songReq) => songReq.id === songReqId)
@@ -176,16 +170,16 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     songReqTotal.current = playlist.list.length
 
     setCurSongReq((val) => {
-      if (val.id === playlist.list[songReqIndex.current].id) {
+      if (val?.id === playlist.list[songReqIndex.current].id) {
         return val
       }
 
       return playlist.list[songReqIndex.current]
     })
-  }, [playerState.endOfList, playerState.requestId, playlist])
+  }, [playerState.endOfList, playerState.requestId, playlist, setCurSongReq])
 
   useEffect(() => {
-    if (onSongReqChange) {
+    if (onSongReqChange && curSongReq) {
       onSongReqChange(curSongReq)
     }
   }, [curSongReq, onSongReqChange])
@@ -196,7 +190,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   // change curSongReq -> change playerState
   useEffect(() => {
-    if (shadowPlayerState.current.requestId === curSongReq.id) {
+    if (!curSongReq || shadowPlayerState.current.requestId === curSongReq.id) {
       return
     }
 
@@ -213,7 +207,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   useEffect(() => {
     // prevent auto scroll when user are reacting with playlist
-    if (isMouseEnterPlaylist.current) {
+    if (isMouseEnterPlaylist.current || !curSongReq) {
       return
     }
 
@@ -304,14 +298,21 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   return (
     <div className="relative w-full h-full overflow-hidden">
       <div className="absolute w-full h-full blur-3xl z-10 bg-primary">
-        <img
-          src={curSongReq.song.thumbnail}
-          alt={curSongReq.song.title}
-          className="object-cover h-full w-full opacity-90 scale-150"
-        />
+        {curSongReq && (
+          <img
+            src={curSongReq.song.thumbnail}
+            alt={curSongReq.song.title}
+            className="object-cover h-full w-full opacity-90 scale-150"
+          />
+        )}
       </div>
       <div className="relative grid grid-rows-[auto_1fr] w-full h-full z-20 backdrop-blur-xl">
-        <div>{miniPlayer}</div>
+        <div
+          id={hasMiniPlayer ? 'video-placeholder' : ''}
+          className={`
+              ${hasMiniPlayer ? 'w-full aspect-video rounded-t-xl' : 'w-0'}
+          `}
+        />
         <div
           ref={scrollRef}
           className="overflow-y-auto space-y-2 lg:space-y-3"
@@ -323,7 +324,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
             <div className="px-2 lg:px-4" key={songReq.id}>
               <SongCard
                 songRequest={songReq}
-                isCurSong={curSongReq.id === songReq.id}
+                isCurSong={curSongReq?.id === songReq.id}
                 play={() => playBySongReqId(songReq.id)}
                 remove={() => removeSongRequest(songReq.id)}
               />

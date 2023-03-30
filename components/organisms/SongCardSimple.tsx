@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { FC, useEffect, useRef, useState } from 'react'
-import { IoAdd, IoCheckmarkDone } from 'react-icons/io5'
+import { IoAdd, IoCheckmarkCircle } from 'react-icons/io5'
 import Song from '../../models/song/Song'
 import { truncateWithEllipsis } from '../../services/utils/string'
 
@@ -47,7 +47,7 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
         </div>
         <div className="absolute bg-green-700/20 w-full h-full z-20 grid place-items-center transition-all duration-75 invisible group-hover:visible">
           {isShowResponse ? (
-            <IoCheckmarkDone className="text-5xl" />
+            <IoCheckmarkCircle className="text-5xl text-green-700/60" />
           ) : (
             <IoAdd className="text-5xl" />
           )}
@@ -55,7 +55,7 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
         <img
           src={song.thumbnail}
           alt={song.title}
-          className="object-cover w-full h-full scale-[1.1]"
+          className="object-cover w-full h-full scale-[1.1] group-active:scale-125 transition-all duration-500"
         />
       </div>
       <div className="pl-4 h-full relative">
