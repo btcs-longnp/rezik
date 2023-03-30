@@ -75,7 +75,7 @@ const Player: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div className="relative bg-primary">
+        <div id="video-wrapper" className="relative bg-primary">
           <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
             <Header page="search" />
           </header>

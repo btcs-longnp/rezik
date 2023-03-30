@@ -146,6 +146,43 @@ const VideoPlayer = () => {
     }
   }, [clonePositionAndClass, playerCtrl, router.route])
 
+  const videoPlaceholderSizeChange: ResizeObserverCallback = useCallback(() => {
+    clonePositionAndClass(
+      playerRef.current,
+      'video-placeholder',
+      playerCtrl,
+      'fixed overflow-hidden w-full group',
+      false
+    )
+  }, [clonePositionAndClass, playerCtrl])
+
+  useEffect(() => {
+    const srcEle = document.getElementById('video-placeholder')
+    const wrapperEle = document.getElementById('video-wrapper')
+
+    const resizeObserver = new ResizeObserver(videoPlaceholderSizeChange)
+
+    Object.values({
+      srcEle,
+      wrapperEle,
+    }).forEach((ele) => {
+      if (ele) {
+        resizeObserver.observe(ele)
+      }
+    })
+
+    return () => {
+      Object.values({
+        srcEle,
+        wrapperEle,
+      }).forEach((ele) => {
+        if (ele) {
+          resizeObserver.unobserve(ele)
+        }
+      })
+    }
+  }, [videoPlaceholderSizeChange, router.route])
+
   return (
     <>
       <ReactionPool elementRef={playerRef} />
