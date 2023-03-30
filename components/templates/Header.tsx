@@ -1,8 +1,9 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import {
+  IoClose,
+  IoExpand,
   IoLogInOutline,
   IoLogOutOutline,
-  IoOpenOutline,
   IoPersonOutline,
   IoWarningOutline,
 } from 'react-icons/io5'
@@ -19,6 +20,9 @@ import SignIn from './SignIn'
 import SignUpAndProfile from './SignUpAndProfile'
 import { getAvatarString } from '../../services/utils/user'
 import Link from 'next/link'
+import IconButton from '../atoms/IconButton'
+import { useRecoilState } from 'recoil'
+import { searchQueryStore } from '../../stores/search'
 
 export interface HeaderProps {
   page?: 'player' | 'search'
@@ -27,6 +31,12 @@ export interface HeaderProps {
 const Header: FC<HeaderProps> = ({ page = 'player' }) => {
   const { currentUser, signOut } = useAuth()
   const [account, setAccount] = useState<Account>()
+  const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
+  const [keyword, setKeyword] = useState<string>(searchQuery)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const timeout = useRef<any>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const shouldFocusSearchInputOnMounted = useRef(true)
 
   const openModalSignUpOrProfile = () => {
     openModal({
@@ -45,6 +55,24 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
     btn?.click()
   }
 
+  const handleChangeKeyword = (value: string) => {
+    setKeyword(value)
+
+    if (timeout.current) {
+      clearTimeout(timeout.current)
+    }
+
+    timeout.current = setTimeout(function () {
+      setSearchQuery(value)
+      timeout.current = undefined
+    }, 600)
+  }
+
+  const handleClearKeyword = () => {
+    setKeyword('')
+    searchInputRef.current?.focus()
+  }
+
   useEffect(() => {
     if (!isAnonymousUser(currentUser)) {
       const acc = getAccountFromLocal()
@@ -55,6 +83,13 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
 
     setAccount(undefined)
   }, [currentUser])
+
+  useEffect(() => {
+    if (searchQuery !== '' && shouldFocusSearchInputOnMounted.current) {
+      searchInputRef.current?.focus()
+      shouldFocusSearchInputOnMounted.current = false
+    }
+  }, [searchQuery])
 
   const GuestMenu = (
     <Menu className="w-64">
@@ -111,42 +146,54 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
   )
 
   return (
-    <div className="grid grid-cols-[1fr_auto] h-full text-secondary">
-      <div className="flex items-center h-full">
-        <div className="flex items-baseline">
-          <span className="font-semibold opacity-80">ISLING</span>
-          <div className="w-1 h-1 bg-secondary rounded-xs"></div>
-          <span className="ml-0.5 text-xs font-normal text-primary-light font-mono">
-            PLAY
-          </span>
+    <>
+      <div className="fixed z-[999] left-1/2 -translate-x-1/2 h-14 flex justify-center items-center text-secondary">
+        <div className="w-[34rem] rounded-full border border-primary-light flex items-center pr-2">
+          <input
+            ref={searchInputRef}
+            value={keyword}
+            placeholder="Search or type Youtube URL"
+            className="w-full pl-4 py-2 outline-none bg-transparent font-light"
+            onChange={({ target: { value } }) => handleChangeKeyword(value)}
+          />
+          {keyword.length > 0 && (
+            <IconButton onClick={handleClearKeyword}>
+              <IoClose className="text-secondary/50 hover:text-secondary text-lg" />
+            </IconButton>
+          )}
         </div>
       </div>
-      <div className="flex items-center h-full space-x-3 lg:space-x-6">
-        {page === 'player' ? (
-          <Link href="/search" target="_blank">
-            <Button size="medium" type="primary" className="flex items-center">
-              Add song
-              <IoOpenOutline className="ml-2" />
-            </Button>
-          </Link>
-        ) : (
-          <Link href="/">
-            <Button size="medium" type="primary">
-              Open Player
-            </Button>
-          </Link>
-        )}
-        <Dropdown menu={isAnonymousUser(currentUser) ? GuestMenu : UserMenu}>
-          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-light cursor-pointer">
-            {isAnonymousUser(currentUser) ? (
-              <IoPersonOutline />
-            ) : (
-              <div className="text-sm">{getAvatarString(currentUser)}</div>
-            )}
+      <div className="grid grid-cols-[1fr_auto] h-full text-secondary">
+        <div className="flex items-center h-full space-x-6">
+          <div className="flex items-baseline">
+            <span className="font-semibold opacity-80">ISLING</span>
+            <div className="w-1 h-1 bg-secondary rounded-xs"></div>
+            <span className="ml-0.5 text-xs font-normal text-primary-light font-mono">
+              PLAY
+            </span>
           </div>
-        </Dropdown>
+          {page !== 'player' && (
+            <Link href="/">
+              <Button size="medium" type="primary">
+                <IoExpand className="mr-2" />
+                Expand Player
+              </Button>
+            </Link>
+          )}
+        </div>
+        <div className="flex items-center h-full space-x-3 lg:space-x-6">
+          <Dropdown menu={isAnonymousUser(currentUser) ? GuestMenu : UserMenu}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-light cursor-pointer">
+              {isAnonymousUser(currentUser) ? (
+                <IoPersonOutline />
+              ) : (
+                <div className="text-sm">{getAvatarString(currentUser)}</div>
+              )}
+            </div>
+          </Dropdown>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
