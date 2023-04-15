@@ -24,14 +24,12 @@ import IconButton from '../../atoms/IconButton'
 import { useRecoilState } from 'recoil'
 import { searchQueryStore } from '../../../stores/search'
 import { Room } from '../../../models/room/Room'
-import { useRouter } from 'next/router'
-import { getRoomById } from '../../../services/room/room'
 
 export interface HeaderProps {
-  page?: 'player' | 'search'
+  room?: Room
 }
 
-const RoomHeader: FC<HeaderProps> = () => {
+const RoomHeader: FC<HeaderProps> = ({ room }) => {
   const { currentUser, signOut } = useAuth()
   const [account, setAccount] = useState<Account>()
   const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
@@ -40,9 +38,6 @@ const RoomHeader: FC<HeaderProps> = () => {
   const timeout = useRef<any>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const shouldFocusSearchInputOnMounted = useRef(true)
-  const router = useRouter()
-  const roomId = router.query.id
-  const [room, setRoom] = useState<Room>()
 
   const openModalSignUpOrProfile = () => {
     openModal({
@@ -78,16 +73,6 @@ const RoomHeader: FC<HeaderProps> = () => {
     setKeyword('')
     searchInputRef.current?.focus()
   }
-
-  useEffect(() => {
-    if (!roomId || typeof roomId !== 'string') {
-      setRoom(undefined)
-      return
-    }
-
-    const room = getRoomById(roomId)
-    setRoom(room)
-  }, [roomId])
 
   useEffect(() => {
     if (!isAnonymousUser(currentUser)) {

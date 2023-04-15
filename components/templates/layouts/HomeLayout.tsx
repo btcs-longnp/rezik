@@ -6,7 +6,7 @@ const HomeLayout: FC<PropsWithChildren<unknown>> = ({ children }) => {
   return (
     <div>
       <Head>
-        <title>isling | Watch Video Together</title>
+        <title>Watch Video Together — isling</title>
         <meta name="description" content="Let's watch videos together" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
