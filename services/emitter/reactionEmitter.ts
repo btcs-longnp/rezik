@@ -5,10 +5,15 @@ const reactionEmitter = new EventEmitter()
 
 export enum ReactionEmitEvent {
   addReaction = 'addReaction',
+  clearReaction = 'clearReaction',
 }
 
 export const emitAddReaction = (data: { id: string; type: ReactionType }) => {
   reactionEmitter.emit(ReactionEmitEvent.addReaction, data)
+}
+
+export const emitClearReaction = () => {
+  reactionEmitter.emit(ReactionEmitEvent.clearReaction)
 }
 
 export const listenAddReaction = (

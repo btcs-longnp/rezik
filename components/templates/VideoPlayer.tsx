@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactPlayer from 'react-player'
 import { useSpring, animated } from '@react-spring/web'
 
 import { playerEvent } from '../../models/eventEmitter/player'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import { curSongReqStore, isPlayingStore } from '../../stores/player'
 import ReactionPool from '../../components/templates/ReactionPool'
-import { emitAddReaction } from '../../services/emitter/reactionEmitter'
+import {
+  emitAddReaction,
+  emitClearReaction,
+} from '../../services/emitter/reactionEmitter'
 import PlayerStateRepository, {
   SnapshotReactionHandler,
 } from '../../services/firestore/PlayerStateRepository'
@@ -14,8 +17,8 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import Button from '../atoms/Button'
 import { IoExpand } from 'react-icons/io5'
+import { playlistStore } from '../../stores/playlist'
 
-const playerRepo = new PlayerStateRepository('isling')
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const initialPos = {
   top: 0,
@@ -31,9 +34,22 @@ const VideoPlayer = () => {
   const player = useRef<ReactPlayer>(null)
   const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore)
   const curSongReq = useRecoilValue(curSongReqStore)
+  const resetCurSongReq = useResetRecoilState(curSongReqStore)
+  const resetPlaylist = useResetRecoilState(playlistStore)
   const playerRef = useRef<HTMLDivElement>(null)
   const [playerProps, playerCtrl] = useSpring(() => ({ from: initialPos }), [])
-  const isMiniPlayer = router.route !== '/'
+  const shouldShowPlayer = router.route.startsWith('/r/[id]')
+  const roomId = shouldShowPlayer ? (router.query.id as string) : undefined
+  const isMiniPlayer = router.route !== '/r/[id]'
+  const livingRoom = `/r/${roomId}`
+
+  const playerRepo = useMemo(() => {
+    if (typeof roomId === 'undefined') {
+      return undefined
+    }
+
+    return new PlayerStateRepository(roomId)
+  }, [roomId])
 
   const onReady = () => {
     console.log('player: onReady')
@@ -123,6 +139,10 @@ const VideoPlayer = () => {
   }, [curSongReq])
 
   useEffect(() => {
+    if (!playerRepo) {
+      return
+    }
+
     const reactionHandler: SnapshotReactionHandler = (id, type) => {
       emitAddReaction({ id, type })
     }
@@ -131,11 +151,12 @@ const VideoPlayer = () => {
 
     return () => {
       unsubReaction()
+      emitClearReaction()
     }
-  }, [])
+  }, [playerRepo])
 
   useEffect(() => {
-    if (router.route === '/') {
+    if (router.route === '/r/[id]') {
       document.onscroll = () => {
         clonePositionAndClass(
           playerRef.current,
@@ -146,7 +167,7 @@ const VideoPlayer = () => {
         )
       }
     }
-  }, [clonePositionAndClass, playerCtrl, router.route])
+  }, [clonePositionAndClass, livingRoom, playerCtrl, router.route])
 
   const videoPlaceholderSizeChange: ResizeObserverCallback = useCallback(() => {
     clonePositionAndClass(
@@ -184,13 +205,21 @@ const VideoPlayer = () => {
     }
   }, [videoPlaceholderSizeChange, router.route])
 
+  // clear data
+  useEffect(() => {
+    return () => {
+      resetPlaylist()
+      resetCurSongReq()
+    }
+  }, [resetCurSongReq, shouldShowPlayer, roomId, resetPlaylist])
+
   return (
-    <>
+    <div className={`${!shouldShowPlayer ? 'hidden' : ''}`}>
       <ReactionPool elementRef={playerRef} />
       <animated.div ref={playerRef} style={playerProps}>
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 invisible group-hover:visible">
           {isMiniPlayer && (
-            <Link href="/">
+            <Link href={livingRoom}>
               <Button type="primary" size="large">
                 <IoExpand className="mr-3 text-lg" />
                 Expand
@@ -214,7 +243,7 @@ const VideoPlayer = () => {
           />
         )}
       </animated.div>
-    </>
+    </div>
   )
 }
 

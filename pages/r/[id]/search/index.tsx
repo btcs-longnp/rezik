@@ -1,33 +1,38 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 
-import { newSongRequest } from '../../models/songRequest/SongRequest'
-import PlaylistBox from '../../components/templates/playlistBox/PlaylistBox'
+import { newSongRequest } from '../../../../models/songRequest/SongRequest'
+import PlaylistBox from '../../../../components/templates/playlistBox/PlaylistBox'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import RoomHeader from '../../components/templates/headers/RoomHeader'
-import Song, { fromYoutubeVideo } from '../../models/song/Song'
-import SongCardSimple from '../../components/organisms/SongCardSimple'
-import { playlistStore } from '../../stores/playlist'
-import { currentUserStore } from '../../stores/currentUser'
-import { pushSongRequest } from '../../models/songRequest/Playlist'
-import PlaylistRepository from '../../services/firestore/PlaylistRepository'
+import RoomHeader from '../../../../components/templates/headers/RoomHeader'
+import Song, { fromYoutubeVideo } from '../../../../models/song/Song'
+import SongCardSimple from '../../../../components/organisms/SongCardSimple'
+import { playlistStore } from '../../../../stores/playlist'
+import { currentUserStore } from '../../../../stores/currentUser'
+import { pushSongRequest } from '../../../../models/songRequest/Playlist'
+import PlaylistRepository from '../../../../services/firestore/PlaylistRepository'
 import {
   getYoutubeVideos,
   searchYoutubeVideo,
-} from '../../services/api/youtube'
-import { YouTubeVideo } from '../../models/youtube/YoutubeVideo'
-import { searchQueryStore } from '../../stores/search'
+} from '../../../../services/api/youtube'
+import { YouTubeVideo } from '../../../../models/youtube/YoutubeVideo'
+import { searchQueryStore } from '../../../../stores/search'
+import { useRouter } from 'next/router'
 
-const playlistRepo = new PlaylistRepository('isling')
 const youtubeVideoURLRegex =
   /^https:\/\/www.youtube.com\/watch\?v=(.*?)(?=&|$).*/
 
-const Player: NextPage = () => {
+const Search: NextPage = () => {
   const playlist = useRecoilValue(playlistStore)
   const currentUser = useRecoilValue(currentUserStore)
   const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
   const [youtubeVideos, setYoutubeVideos] = useState<YouTubeVideo[]>([])
+  const router = useRouter()
+
+  const roomId = (router.query.id as string) || 'isling'
+
+  const playlistRepo = useMemo(() => new PlaylistRepository(roomId), [roomId])
 
   const searchVideo = async (query: string) => {
     if (query === '') {
@@ -103,4 +108,4 @@ const Player: NextPage = () => {
   )
 }
 
-export default Player
+export default Search
