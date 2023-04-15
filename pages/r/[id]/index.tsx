@@ -55,7 +55,7 @@ const Player: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>{`${room?.name} — isling`}</title>
+        <title>{`${room ? room.name : ''} — isling`}</title>
         <meta name="description" content="Let's watch videos together" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

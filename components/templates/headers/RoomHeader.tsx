@@ -177,7 +177,7 @@ const RoomHeader: FC<HeaderProps> = ({ room }) => {
           <div className="max-w-[192px] flex items-center bg-primary-light rounded px-3 h-8">
             <IoTvOutline className="text-lg text-secondary/80" />
             <div className="truncate text-ellipsis ml-2 font-light text-secondary/90 text-sm">
-              {room?.name}
+              {room ? room.name : ''}
             </div>
           </div>
         </div>
