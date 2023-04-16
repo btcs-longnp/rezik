@@ -5,7 +5,7 @@ const websiteURL = process.env.NEXT_PUBLIC_WEBSITE_URL
 
 const HomeHead: FC = () => (
   <Head>
-    <title>Watch Video Together — isling</title>
+    <title>Isling</title>
     <meta name="description" content="Let's watch videos together" />
     <meta property="og:url" content={websiteURL} />
     <meta property="og:type" content="article" />
