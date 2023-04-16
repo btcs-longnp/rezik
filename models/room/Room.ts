@@ -1,6 +1,8 @@
 export interface Room {
-  name: string
   id: string
+  name: string
   coverUrl: string
   description: string
 }
+
+export type RoomPublic = Pick<Room, 'id' | 'name' | 'coverUrl' | 'description'>

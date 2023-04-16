@@ -23,10 +23,10 @@ import Link from 'next/link'
 import IconButton from '../../atoms/IconButton'
 import { useRecoilState } from 'recoil'
 import { searchQueryStore } from '../../../stores/search'
-import { Room } from '../../../models/room/Room'
+import { RoomPublic } from '../../../models/room/Room'
 
 export interface HeaderProps {
-  room?: Room
+  room: RoomPublic
 }
 
 const RoomHeader: FC<HeaderProps> = ({ room }) => {
@@ -177,7 +177,7 @@ const RoomHeader: FC<HeaderProps> = ({ room }) => {
           <div className="max-w-[192px] flex items-center bg-primary-light rounded px-3 h-8">
             <IoTvOutline className="text-lg text-secondary/80" />
             <div className="truncate text-ellipsis ml-2 font-light text-secondary/90 text-sm">
-              {room ? room.name : ''}
+              {room.name}
             </div>
           </div>
         </div>
