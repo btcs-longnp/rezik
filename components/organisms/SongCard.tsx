@@ -61,6 +61,7 @@ const SongCard: FC<SongCardProps> = ({
           alt={songRequest.song.title}
           className="object-cover w-full h-full scale-[1.4]"
           fill
+          sizes="256px"
         />
       </div>
       <div className="pl-2 text-[#f8f8f2] h-full relative">

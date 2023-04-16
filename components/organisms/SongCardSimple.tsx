@@ -58,6 +58,7 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
           alt={song.title}
           className="object-cover w-full h-full scale-[1.1] group-active:scale-125 transition-all duration-500"
           fill
+          sizes="480px"
         />
       </div>
       <div className="pl-4 h-full relative">

@@ -43,7 +43,6 @@ const Home: NextPage = () => {
               </div>
             </div>
           }
-          childrenData={forYouRooms}
         >
           {forYouRooms.map((room) => (
             <div
@@ -57,6 +56,7 @@ const Home: NextPage = () => {
                     alt={room.name}
                     className="object-cover"
                     fill
+                    sizes="480px"
                   />
                 </div>
               </Link>

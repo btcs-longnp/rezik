@@ -313,6 +313,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
             alt={curSongReq.song.title}
             className="object-cover h-full w-full opacity-90 scale-150"
             fill
+            sizes="512px"
           />
         )}
       </div>
