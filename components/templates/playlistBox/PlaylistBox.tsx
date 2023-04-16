@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import { useRef, useEffect, useState, FC, useCallback, useMemo } from 'react'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import { newSong } from '../../../models/song/Song'
 import PlaylistRepository from '../../../services/firestore/PlaylistRepository'
@@ -22,7 +23,6 @@ import { playerEvent } from '../../../models/eventEmitter/player'
 import { useRecoilState } from 'recoil'
 import { playlistStore } from '../../../stores/playlist'
 import { curSongReqStore } from '../../../stores/player'
-import { useRouter } from 'next/router'
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -308,10 +308,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     <div className="relative w-full h-full overflow-hidden">
       <div className="absolute w-full h-full blur-3xl z-10 bg-primary">
         {curSongReq && (
-          <img
+          <Image
             src={curSongReq.song.thumbnail}
             alt={curSongReq.song.title}
             className="object-cover h-full w-full opacity-90 scale-150"
+            fill
           />
         )}
       </div>

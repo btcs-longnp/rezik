@@ -1,6 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoPlay, IoTrash } from 'react-icons/io5'
+import Image from 'next/image'
+
 import SongRequest from '../../models/songRequest/SongRequest'
 import { truncateWithEllipsis } from '../../services/utils/string'
 import IconButton from '../atoms/IconButton'
@@ -55,10 +56,11 @@ const SongCard: FC<SongCardProps> = ({
             />
           </div>
         )}
-        <img
+        <Image
           src={songRequest.song.thumbnail}
           alt={songRequest.song.title}
           className="object-cover w-full h-full scale-[1.4]"
+          fill
         />
       </div>
       <div className="pl-2 text-[#f8f8f2] h-full relative">

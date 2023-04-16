@@ -1,15 +1,16 @@
-/* eslint-disable @next/next/no-img-element */
 import type { NextPage } from 'next'
 import HomeLayout from '../components/templates/layouts/HomeLayout'
 import Link from 'next/link'
 import { IoPersonOutline } from 'react-icons/io5'
 import { useRecoilValue } from 'recoil'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+
 import { currentUserStore } from '../stores/currentUser'
 import { isAnonymousUser } from '../models/user/User'
 import { getAvatarString } from '../services/utils/user'
 import Roll from '../components/organisms/Roll'
 import { Room } from '../models/room/Room'
-import { useEffect, useState } from 'react'
 import { getForYouRooms } from '../services/room/room'
 
 const Home: NextPage = () => {
@@ -46,11 +47,12 @@ const Home: NextPage = () => {
           {forYouRooms.map((room) => (
             <div className="w-80" key={room.id}>
               <Link href={`/r/${room.id}`}>
-                <div className="aspect-video rounded w-80 overflow-hidden hover:brightness-75">
-                  <img
+                <div className="relative aspect-video rounded w-80 overflow-hidden hover:brightness-75">
+                  <Image
                     src={room.coverUrl}
                     alt={room.name}
-                    className="object-cover w-full h-full"
+                    className="object-cover"
+                    fill
                   />
                 </div>
               </Link>

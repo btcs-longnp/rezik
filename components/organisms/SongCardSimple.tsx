@@ -1,6 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoAdd, IoCheckmarkCircle } from 'react-icons/io5'
+import Image from 'next/image'
+
 import Song from '../../models/song/Song'
 import { truncateWithEllipsis } from '../../services/utils/string'
 
@@ -52,10 +53,11 @@ const SongCardSimple: FC<SongCardProps> = ({ song }) => {
             <IoAdd className="text-5xl" />
           )}
         </div>
-        <img
+        <Image
           src={song.thumbnail}
           alt={song.title}
           className="object-cover w-full h-full scale-[1.1] group-active:scale-125 transition-all duration-500"
+          fill
         />
       </div>
       <div className="pl-4 h-full relative">
