@@ -56,7 +56,7 @@ const Home: NextPage = () => {
                     alt={room.name}
                     className="object-cover"
                     fill
-                    sizes="480px"
+                    unoptimized
                   />
                 </div>
               </Link>
