@@ -1,42 +1,30 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
-  IoClose,
-  IoExpand,
   IoLogInOutline,
   IoLogOutOutline,
   IoPersonOutline,
   IoWarningOutline,
 } from 'react-icons/io5'
-import { Account } from '../../models/account/Account'
-import { isAnonymousUser } from '../../models/user/User'
-import { getAccountFromLocal } from '../../services/simpleAuth/localAccount'
-import { useAuth } from '../../services/hook/useAuth'
-import Button from '../atoms/Button'
-import CopyButton from '../atoms/CopyButton'
-import Dropdown from '../atoms/Dropdown'
-import Menu, { MenuItem } from '../atoms/Menu'
-import { openModal } from '../atoms/Modal'
-import SignIn from './SignIn'
-import SignUpAndProfile from './SignUpAndProfile'
-import { getAvatarString } from '../../services/utils/user'
+import { Account } from '../../../models/account/Account'
+import { isAnonymousUser } from '../../../models/user/User'
+import { getAccountFromLocal } from '../../../services/simpleAuth/localAccount'
+import { useAuth } from '../../../services/hook/useAuth'
+import CopyButton from '../../atoms/CopyButton'
+import Dropdown from '../../atoms/Dropdown'
+import Menu, { MenuItem } from '../../atoms/Menu'
+import { openModal } from '../../atoms/Modal'
+import SignIn from '../SignIn'
+import SignUpAndProfile from '../SignUpAndProfile'
+import { getAvatarString } from '../../../services/utils/user'
 import Link from 'next/link'
-import IconButton from '../atoms/IconButton'
-import { useRecoilState } from 'recoil'
-import { searchQueryStore } from '../../stores/search'
 
 export interface HeaderProps {
   page?: 'player' | 'search'
 }
 
-const Header: FC<HeaderProps> = ({ page = 'player' }) => {
+const HomeHeader: FC<HeaderProps> = () => {
   const { currentUser, signOut } = useAuth()
   const [account, setAccount] = useState<Account>()
-  const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
-  const [keyword, setKeyword] = useState<string>(searchQuery)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const timeout = useRef<any>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const shouldFocusSearchInputOnMounted = useRef(true)
 
   const openModalSignUpOrProfile = () => {
     openModal({
@@ -55,24 +43,6 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
     btn?.click()
   }
 
-  const handleChangeKeyword = (value: string) => {
-    setKeyword(value)
-
-    if (timeout.current) {
-      clearTimeout(timeout.current)
-    }
-
-    timeout.current = setTimeout(function () {
-      setSearchQuery(value)
-      timeout.current = undefined
-    }, 600)
-  }
-
-  const handleClearKeyword = () => {
-    setKeyword('')
-    searchInputRef.current?.focus()
-  }
-
   useEffect(() => {
     if (!isAnonymousUser(currentUser)) {
       const acc = getAccountFromLocal()
@@ -83,13 +53,6 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
 
     setAccount(undefined)
   }, [currentUser])
-
-  useEffect(() => {
-    if (searchQuery !== '' && shouldFocusSearchInputOnMounted.current) {
-      searchInputRef.current?.focus()
-      shouldFocusSearchInputOnMounted.current = false
-    }
-  }, [searchQuery])
 
   const GuestMenu = (
     <Menu className="w-64">
@@ -148,38 +111,32 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
   return (
     <>
       <div className="fixed z-[999] left-1/2 -translate-x-1/2 h-14 flex justify-center items-center text-secondary">
-        <div className="w-[34rem] rounded-full border border-primary-light flex items-center pr-2">
-          <input
-            ref={searchInputRef}
-            value={keyword}
-            placeholder="Search or type Youtube URL"
-            className="w-full pl-4 py-2 outline-none bg-transparent font-light"
-            onChange={({ target: { value } }) => handleChangeKeyword(value)}
-          />
-          {keyword.length > 0 && (
-            <IconButton onClick={handleClearKeyword}>
-              <IoClose className="text-secondary/50 hover:text-secondary text-lg" />
-            </IconButton>
-          )}
+        <div className="w-[34rem] rounded-full flex justify-center items-center pr-2 space-x-12">
+          <Link href="/" className="text-lg font-semibold  text-secondary/90">
+            Home
+          </Link>
+          <Link href="/" className="text-lg font-semibold text-secondary/60">
+            Explore
+          </Link>
+          <Link href="/" className="text-lg font-semibold text-secondary/60">
+            Your room
+          </Link>
+          <Link href="/" className="text-lg font-semibold text-secondary/60">
+            Search
+          </Link>
         </div>
       </div>
       <div className="grid grid-cols-[1fr_auto] h-full text-secondary">
         <div className="flex items-center h-full space-x-6">
-          <div className="flex items-baseline">
-            <span className="font-semibold opacity-80">ISLING</span>
-            <div className="w-1 h-1 bg-secondary rounded-xs"></div>
-            <span className="ml-0.5 text-xs font-normal text-primary-light font-mono">
-              PLAY
-            </span>
-          </div>
-          {page !== 'player' && (
-            <Link href="/">
-              <Button size="medium" type="primary">
-                <IoExpand className="mr-2" />
-                Expand Player
-              </Button>
-            </Link>
-          )}
+          <Link href="/">
+            <div className="flex items-baseline">
+              <span className="font-semibold opacity-80">ISLING</span>
+              <div className="w-1 h-1 bg-secondary rounded-xs"></div>
+              <span className="ml-0.5 text-xs font-normal text-primary-light font-mono">
+                PLAY
+              </span>
+            </div>
+          </Link>
         </div>
         <div className="flex items-center h-full space-x-3 lg:space-x-6">
           <Dropdown menu={isAnonymousUser(currentUser) ? GuestMenu : UserMenu}>
@@ -197,4 +154,4 @@ const Header: FC<HeaderProps> = ({ page = 'player' }) => {
   )
 }
 
-export default Header
+export default HomeHeader

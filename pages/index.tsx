@@ -1,87 +1,76 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import { useEffect } from 'react'
-import { useRouter } from 'next/router'
+import HomeLayout from '../components/templates/layouts/HomeLayout'
+import Link from 'next/link'
+import { IoPersonOutline } from 'react-icons/io5'
 import { useRecoilValue } from 'recoil'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
-import PlaylistBox from '../components/templates/playlistBox/PlaylistBox'
-import Header from '../components/templates/Header'
-import { searchQueryStore } from '../stores/search'
-import ReactionIcon from '../components/atoms/ReactionIcon'
-import { ReactionType } from '../models/Reaction'
-import PlayerStateRepository from '../services/firestore/PlayerStateRepository'
-import { curSongReqStore } from '../stores/player'
+import { currentUserStore } from '../stores/currentUser'
+import { isAnonymousUser } from '../models/user/User'
+import { getAvatarString } from '../services/utils/user'
+import Roll from '../components/organisms/Roll'
+import { Room } from '../models/room/Room'
+import { getForYouRooms } from '../services/room/room'
 
-const playerRepo = new PlayerStateRepository('isling')
-const listReaction: ReactionType[] = [
-  'haha',
-  'heart',
-  'sad',
-  'surprise',
-  'angry',
-]
-
-const Player: NextPage = () => {
-  const searchQuery = useRecoilValue(searchQueryStore)
-  const curSongReq = useRecoilValue(curSongReqStore)
-  const router = useRouter()
-
-  const handleReaction = (type: ReactionType) => () => {
-    playerRepo.reaction(type)
-  }
+const Home: NextPage = () => {
+  const currentUser = useRecoilValue(currentUserStore)
+  const [forYouRooms, setForYouRooms] = useState<Room[]>([])
 
   useEffect(() => {
-    if (searchQuery !== '') {
-      router.push('/search')
-    }
-  }, [searchQuery, router])
+    const rooms = getForYouRooms()
+    setForYouRooms(rooms)
+  }, [])
 
   return (
-    <div>
-      <Head>
-        <title>isling - Watch Video Together</title>
-        <meta name="description" content="Let's watch videos together" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main>
-        <div className="relative bg-primary">
-          <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
-            <Header />
-          </header>
-          <div className="fixed top-[4.5rem] right-6 overflow-hidden lg:rounded-xl lg:h-[calc(100vh-6rem)] lg:w-[26rem]">
-            <PlaylistBox />
-          </div>
-          <div className="pl-6 pr-[29rem]">
-            <div className="lg:h-[4.5rem]" />
-            <div
-              id="video-placeholder"
-              className="overflow-hidden lg:rounded-sm aspect-[3/2] lg:aspect-video lg:w-full"
-            />
-            <div className="text-xl text-secondary mt-3">
-              {curSongReq?.song.title}
-            </div>
-            <div className="grid grid-cols-[1fr_auto] text-secondary h-16 mb-6">
-              <div className="mt-6 flex space-x-4" />
-              <div className="flex space-x-4 items-center">
-                {listReaction.map((type) => (
-                  <div
-                    key={type}
-                    onClick={handleReaction(type as ReactionType)}
-                    className="w-12 h-12 cursor-pointer hover:w-16 hover:h-16 transition-all duration-700 group"
-                  >
-                    <ReactionIcon
-                      type={type as ReactionType}
-                      className="group-active:scale-110 transition-all duration-100"
-                    />
-                  </div>
-                ))}
+    <HomeLayout>
+      <div className="mx-32">
+        <Roll
+          title={
+            <div className="flex pb-2">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary-light cursor-pointer">
+                {isAnonymousUser(currentUser) ? (
+                  <IoPersonOutline className="text-xl" />
+                ) : (
+                  <div className="text-xl">{getAvatarString(currentUser)}</div>
+                )}
+              </div>
+              <div className="ml-4 h-full flex flex-col justify-between">
+                <div className="text-secondary/60 leading-none font-light">
+                  {currentUser.name.toUpperCase()}
+                </div>
+                <div className="text-3xl font-semibold">For you</div>
               </div>
             </div>
-          </div>
-        </div>
-      </main>
-    </div>
+          }
+          childrenData={forYouRooms}
+        >
+          {forYouRooms.map((room) => (
+            <div className="w-80" key={room.id}>
+              <Link href={`/r/${room.id}`}>
+                <div className="relative aspect-video rounded w-80 overflow-hidden hover:brightness-75">
+                  <Image
+                    src={room.coverUrl}
+                    alt={room.name}
+                    className="object-cover"
+                    fill
+                  />
+                </div>
+              </Link>
+              <div className="mt-4">
+                <Link href={`/r/${room.id}`}>{room.name}</Link>
+              </div>
+              {room.description && (
+                <div className="text-secondary/40 font-light mt-2">
+                  {room.description}
+                </div>
+              )}
+            </div>
+          ))}
+        </Roll>
+      </div>
+    </HomeLayout>
   )
 }
 
-export default Player
+export default Home

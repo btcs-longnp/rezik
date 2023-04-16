@@ -1,5 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
-import { useRef, useEffect, useState, FC, useCallback } from 'react'
+import { useRef, useEffect, useState, FC, useCallback, useMemo } from 'react'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 import { newSong } from '../../../models/song/Song'
 import PlaylistRepository from '../../../services/firestore/PlaylistRepository'
@@ -22,10 +23,6 @@ import { playerEvent } from '../../../models/eventEmitter/player'
 import { useRecoilState } from 'recoil'
 import { playlistStore } from '../../../stores/playlist'
 import { curSongReqStore } from '../../../stores/player'
-
-const roomId = 'isling'
-const playlistRepo = new PlaylistRepository(roomId)
-const playlistStateRepo = new PlayerStateRepository(roomId)
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -54,9 +51,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   hasMiniPlayer = false,
 }) => {
   const [playlist, setPlaylist] = useRecoilState<Playlist>(playlistStore)
-  const [playerState, setPlayerState] = useState<PlayerState>(
-    newPlayerState(defaultSongReq, 0)
-  )
+  const [playerState, setPlayerState] = useState<PlayerState>()
   const [isSync, setIsSync] = useState(true)
   const [curSongReq, setCurSongReq] = useRecoilState(curSongReqStore)
   const songReqIndex = useRef(0)
@@ -67,6 +62,12 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const shadowIsSync = useRef(isSync)
   const isMouseEnterPlaylist = useRef(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  const roomId = (router.query.id as string) || 'isling'
+
+  const playlistRepo = useMemo(() => new PlaylistRepository(roomId), [roomId])
+  const playerRepo = useMemo(() => new PlayerStateRepository(roomId), [roomId])
 
   const next = () => {
     if (songReqIndex.current >= playlist.list.length - 1) {
@@ -89,14 +90,14 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   const handleVideoEndOrError = useCallback(() => {
     if (songReqIndex.current >= playlist.list.length - 1) {
-      playlistStateRepo.updatePlayerState({ endOfList: true })
+      playerRepo.updatePlayerState({ endOfList: true })
 
       return
     }
 
     songReqIndex.current += 1
     setCurSongReq(playlist.list[songReqIndex.current])
-  }, [playlist.list, setCurSongReq])
+  }, [playerRepo, playlist.list, setCurSongReq])
 
   const playBySongReqId = (songReqId: string) => {
     const idx = playlist.list.findIndex((songReq) => songReq.id === songReqId)
@@ -125,7 +126,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   const clearPlaylist = async () => {
     await playlistRepo.removePlaylist()
-    await playlistStateRepo.removeController()
+    await playerRepo.removeController()
     setPlaylist(newPlaylist([], 0))
     alert('Clear playlist successfully')
   }
@@ -150,11 +151,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
       return
     }
 
-    if (playerState.endOfList && playlist.list.length > songReqTotal.current) {
+    if (playerState?.endOfList && playlist.list.length > songReqTotal.current) {
       songReqIndex.current = songReqTotal.current
     } else {
       const curSongReqIdx = playlist.list.findIndex(
-        (songReq) => songReq.id === playerState.requestId
+        (songReq) => songReq.id === playerState?.requestId
       )
 
       if (curSongReqIdx >= 0) {
@@ -176,7 +177,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
       return playlist.list[songReqIndex.current]
     })
-  }, [playerState.endOfList, playerState.requestId, playlist, setCurSongReq])
+  }, [playerState?.endOfList, playerState?.requestId, playlist, setCurSongReq])
 
   useEffect(() => {
     if (onSongReqChange && curSongReq) {
@@ -190,7 +191,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 
   // change curSongReq -> change playerState
   useEffect(() => {
-    if (!curSongReq || shadowPlayerState.current.requestId === curSongReq.id) {
+    if (
+      !curSongReq ||
+      !shadowPlayerState.current ||
+      shadowPlayerState.current.requestId === curSongReq.id
+    ) {
       return
     }
 
@@ -199,11 +204,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     console.log('player: change player state:', theNewState)
 
     if (shadowIsSync.current && syncFirstTimeDone.current) {
-      playlistStateRepo.setPlayerState(theNewState)
+      playerRepo.setPlayerState(theNewState)
     } else {
       setPlayerState(theNewState)
     }
-  }, [curSongReq])
+  }, [curSongReq, playerRepo])
 
   useEffect(() => {
     // prevent auto scroll when user are reacting with playlist
@@ -240,6 +245,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
       console.log('player: playlist changed:', playlist)
       if (!playlist) {
         setPlaylist(newPlaylist([], 0))
+
         return
       }
 
@@ -249,27 +255,30 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     return () => {
       unsubPlaylist()
     }
-  }, [setPlaylist])
+  }, [playlistRepo, setPlaylist])
 
   useEffect(() => {
     if (!isSync) {
       return
     }
 
-    const unsubController = playlistStateRepo.onSnapshotController((state) => {
+    const unsubController = playerRepo.onSnapshotController((state) => {
       console.log('player: player state changed:', state)
+      syncFirstTimeDone.current = true
 
-      if (state !== undefined) {
-        setPlayerState(state)
+      if (!state) {
+        setPlayerState(newPlayerState(defaultSongReq, 0))
+
+        return
       }
 
-      syncFirstTimeDone.current = true
+      setPlayerState(state)
     })
 
     return () => {
       unsubController()
     }
-  }, [isSync])
+  }, [isSync, playerRepo])
 
   useEffect(() => {
     playerEvent.on('ended', handleVideoEndOrError)
@@ -299,10 +308,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     <div className="relative w-full h-full overflow-hidden">
       <div className="absolute w-full h-full blur-3xl z-10 bg-primary">
         {curSongReq && (
-          <img
+          <Image
             src={curSongReq.song.thumbnail}
             alt={curSongReq.song.title}
             className="object-cover h-full w-full opacity-90 scale-150"
+            fill
           />
         )}
       </div>
