@@ -94,6 +94,16 @@ export default Player
 
 export async function getServerSideProps(context: NextPageContext) {
   const room = getRoomById(context.query.id as string)
+
+  if (!room) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/r/${context.query.id}/404`,
+      },
+    }
+  }
+
   const roomPublic = toRoomPublic(room)
 
   return {

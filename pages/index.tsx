@@ -46,7 +46,10 @@ const Home: NextPage = () => {
           childrenData={forYouRooms}
         >
           {forYouRooms.map((room) => (
-            <div className="w-80" key={room.id}>
+            <div
+              className="w-80 active:scale-95 transition-all duration-100"
+              key={room.id}
+            >
               <Link href={`/r/${room.id}`}>
                 <div className="relative aspect-video rounded w-80 overflow-hidden hover:brightness-75">
                   <Image
