@@ -15,7 +15,7 @@ import PlayerStateRepository, {
 } from '../../services/firestore/PlayerStateRepository'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import Button from '../atoms/Button'
+import Button from '../atoms/buttons/Button'
 import { IoExpand } from 'react-icons/io5'
 import { playlistStore } from '../../stores/playlist'
 

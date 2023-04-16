@@ -1,7 +1,7 @@
 import EventEmitter from 'events'
 import { FC, ReactElement, useCallback, useEffect, useState } from 'react'
 import { IoClose } from 'react-icons/io5'
-import IconButton from './IconButton'
+import IconButton from './buttons/IconButton'
 
 const eventEmitter = new EventEmitter()
 

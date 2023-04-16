@@ -4,7 +4,7 @@ import Image from 'next/image'
 
 import SongRequest from '../../models/songRequest/SongRequest'
 import { truncateWithEllipsis } from '../../services/utils/string'
-import IconButton from '../atoms/IconButton'
+import IconButton from '../atoms/buttons/IconButton'
 
 export interface SongCardProps {
   songRequest: SongRequest

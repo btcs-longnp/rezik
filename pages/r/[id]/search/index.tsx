@@ -21,7 +21,7 @@ import { useRouter } from 'next/router'
 import { getRoomById } from '../../../../services/room/room'
 import { RoomPublic } from '../../../../models/room/Room'
 import { toRoomPublic } from '../../../../models/room/transform'
-import RoomHead from '../../../../components/atoms/head/RoomHead'
+import RoomHead from '../../../../components/atoms/heads/RoomHead'
 
 const youtubeVideoURLRegex =
   /^(?:(?:https:\/\/)?(?:www.)?youtube.com\/watch\?v=(.*?)(?=&|$).*)|(?:(?:https:\/\/)?(?:.*?)\/(.*?)$)/
