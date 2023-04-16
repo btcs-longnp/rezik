@@ -9,7 +9,7 @@ import {
   saveAccountToLocal,
 } from '../../services/simpleAuth/localAccount'
 import { currentUserStore } from '../../stores/currentUser'
-import Button from '../atoms/Button'
+import Button from '../atoms/buttons/Button'
 import Input from '../atoms/Input'
 
 const SignUpAndProfile: FC = () => {

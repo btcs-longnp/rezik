@@ -7,37 +7,14 @@ import {
   useState,
 } from 'react'
 import { IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5'
-import IconButtonOutline from '../atoms/IconButtonOutline'
-
-const getElementByScrollOffset = (
-  offsetLeft: number,
-  parentEle: HTMLElement
-): HTMLElement | undefined => {
-  for (let i = 0; i < parentEle.children.length; i += 1) {
-    const ele = parentEle.children.item(i) as HTMLDivElement
-    const offsetLeftOnScroll = ele.offsetLeft - parentEle.offsetLeft
-
-    if (
-      offsetLeftOnScroll <= offsetLeft &&
-      offsetLeft <= offsetLeftOnScroll + ele.clientWidth
-    ) {
-      return ele
-    }
-  }
-
-  return undefined
-}
+import IconButtonOutline from '../atoms/buttons/IconButtonOutline'
+import { getElementByScrollOffsetLeft } from '../../services/utils/html'
 
 export interface RollProps {
   title?: ReactElement
-  childrenData?: unknown
 }
 
-const Roll: FC<PropsWithChildren<RollProps>> = ({
-  title,
-  children,
-  childrenData,
-}) => {
+const Roll: FC<PropsWithChildren<RollProps>> = ({ title, children }) => {
   const [btnEnable, setBtnEnable] = useState({ prev: false, next: false })
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -48,7 +25,7 @@ const Roll: FC<PropsWithChildren<RollProps>> = ({
 
     const { clientWidth, scrollLeft } = scrollRef.current
 
-    const ele = getElementByScrollOffset(
+    const ele = getElementByScrollOffsetLeft(
       scrollLeft + clientWidth,
       scrollRef.current
     )
@@ -67,9 +44,9 @@ const Roll: FC<PropsWithChildren<RollProps>> = ({
       return
     }
 
-    const { clientWidth, scrollLeft } = scrollRef.current
+    const { clientWidth, scrollLeft, offsetLeft } = scrollRef.current
 
-    const ele = getElementByScrollOffset(scrollLeft, scrollRef.current)
+    const ele = getElementByScrollOffsetLeft(scrollLeft, scrollRef.current)
 
     if (!ele) {
       return
@@ -77,10 +54,7 @@ const Roll: FC<PropsWithChildren<RollProps>> = ({
 
     const left = Math.max(
       0,
-      ele.offsetLeft +
-        ele.clientWidth -
-        clientWidth -
-        scrollRef.current.offsetLeft
+      ele.offsetLeft + ele.clientWidth - clientWidth - offsetLeft
     )
 
     scrollRef.current.scrollTo({ left, behavior: 'smooth' })
@@ -104,10 +78,20 @@ const Roll: FC<PropsWithChildren<RollProps>> = ({
       })
     }
 
-    handleScroll()
-
     scrollRef.current.onscroll = handleScroll
-  }, [childrenData])
+
+    const resizeObs = new ResizeObserver(() => {
+      handleScroll()
+    })
+
+    resizeObs.observe(scrollRef.current)
+
+    const ele = scrollRef.current
+
+    return () => {
+      resizeObs.unobserve(ele)
+    }
+  }, [])
 
   return (
     <>

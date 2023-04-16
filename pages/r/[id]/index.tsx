@@ -13,7 +13,7 @@ import { curSongReqStore } from '../../../stores/player'
 import { RoomPublic } from '../../../models/room/Room'
 import { getRoomById } from '../../../services/room/room'
 import { toRoomPublic } from '../../../models/room/transform'
-import RoomHead from '../../../components/atoms/head/RoomHead'
+import RoomHead from '../../../components/atoms/heads/RoomHead'
 
 const listReaction: ReactionType[] = [
   'haha',

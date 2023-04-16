@@ -28,11 +28,11 @@ const Home: NextPage = () => {
         <Roll
           title={
             <div className="flex pb-2">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary-light cursor-pointer">
+              <div className="flex items-center justify-center w-16 h-16 font-light rounded-full bg-primary-light">
                 {isAnonymousUser(currentUser) ? (
-                  <IoPersonOutline className="text-xl" />
+                  <IoPersonOutline className="text-2xl" />
                 ) : (
-                  <div className="text-xl">{getAvatarString(currentUser)}</div>
+                  <div className="text-2xl">{getAvatarString(currentUser)}</div>
                 )}
               </div>
               <div className="ml-4 h-full flex flex-col justify-between">
@@ -43,7 +43,6 @@ const Home: NextPage = () => {
               </div>
             </div>
           }
-          childrenData={forYouRooms}
         >
           {forYouRooms.map((room) => (
             <div
@@ -57,6 +56,7 @@ const Home: NextPage = () => {
                     alt={room.name}
                     className="object-cover"
                     fill
+                    sizes="480px"
                   />
                 </div>
               </Link>

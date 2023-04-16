@@ -1,7 +1,7 @@
 import { FC, PropsWithChildren } from 'react'
 
 import HomeHeader from '../headers/HomeHeader'
-import HomeHead from '../../atoms/head/HomeHead'
+import HomeHead from '../../atoms/heads/HomeHead'
 
 const HomeLayout: FC<PropsWithChildren<unknown>> = ({ children }) => {
   return (
