@@ -43,6 +43,7 @@ const Home: NextPage = () => {
               </div>
             </div>
           }
+          childrenData={forYouRooms}
         >
           {forYouRooms.map((room) => (
             <div className="w-80" key={room.id}>
