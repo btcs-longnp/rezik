@@ -8,7 +8,7 @@ import {
 import { Account } from '../../../models/account/Account'
 import { isAnonymousUser } from '../../../models/user/User'
 import { getAccountFromLocal } from '../../../services/simpleAuth/localAccount'
-import { useAuth } from '../../../services/hook/useAuth'
+import { useAuth } from '../../../services/simpleAuth/useAuth'
 import CopyButton from '../../atoms/buttons/CopyButton'
 import Dropdown from '../../atoms/Dropdown'
 import Menu, { MenuItem } from '../../atoms/Menu'

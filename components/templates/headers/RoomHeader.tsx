@@ -11,7 +11,7 @@ import {
 import { Account } from '../../../models/account/Account'
 import { isAnonymousUser } from '../../../models/user/User'
 import { getAccountFromLocal } from '../../../services/simpleAuth/localAccount'
-import { useAuth } from '../../../services/hook/useAuth'
+import { useAuth } from '../../../services/simpleAuth/useAuth'
 import CopyButton from '../../atoms/buttons/CopyButton'
 import Dropdown from '../../atoms/Dropdown'
 import Menu, { MenuItem } from '../../atoms/Menu'
@@ -27,9 +27,14 @@ import { RoomPublic } from '../../../models/room/Room'
 
 export interface HeaderProps {
   room: RoomPublic
+  backBtn?: {
+    url: string
+    title: string
+  }
+  isShowRoom?: boolean
 }
 
-const RoomHeader: FC<HeaderProps> = ({ room }) => {
+const RoomHeader: FC<HeaderProps> = ({ room, backBtn, isShowRoom }) => {
   const { currentUser, signOut } = useAuth()
   const [account, setAccount] = useState<Account>()
   const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
@@ -153,7 +158,7 @@ const RoomHeader: FC<HeaderProps> = ({ room }) => {
           <input
             ref={searchInputRef}
             value={keyword}
-            placeholder="Search or type Youtube URL"
+            placeholder="Search or paste Youtube URL"
             className="w-full pl-4 py-2 outline-none bg-transparent font-light"
             onChange={({ target: { value } }) => handleChangeKeyword(value)}
           />
@@ -165,21 +170,25 @@ const RoomHeader: FC<HeaderProps> = ({ room }) => {
         </div>
       </div>
       <div className="grid grid-cols-[1fr_auto] h-full text-secondary">
-        <div className="flex items-center h-full space-x-8">
-          <Link href="/" className="cursor-pointer">
-            <div className="flex items-center space-x-0 group text-blue-300">
-              <IoChevronBack className="text-2xl group-hover:brightness-75 group-active:scale-95" />
-              <div className="font-light group-hover:brightness-75 text-sm hidden xl:block">
-                Home
+        <div className="max-w-[192px] flex items-center h-full space-x-8">
+          {backBtn && (
+            <Link href={backBtn.url} className="cursor-pointer">
+              <div className="flex items-center space-x-0 group text-blue-300">
+                <IoChevronBack className="text-2xl group-hover:brightness-75 group-active:scale-95" />
+                <div className="truncate text-ellipsis font-light group-hover:brightness-75 text-sm hidden xl:block">
+                  {backBtn.title}
+                </div>
+              </div>
+            </Link>
+          )}
+          {isShowRoom && (
+            <div className="max-w-[192px] flex items-center bg-primary-light rounded px-3 h-8">
+              <IoTvOutline className="text-lg text-secondary/80" />
+              <div className="truncate text-ellipsis ml-2 font-light text-secondary/90 text-sm">
+                {room.name}
               </div>
             </div>
-          </Link>
-          <div className="max-w-[192px] flex items-center bg-primary-light rounded px-3 h-8">
-            <IoTvOutline className="text-lg text-secondary/80" />
-            <div className="truncate text-ellipsis ml-2 font-light text-secondary/90 text-sm">
-              {room.name}
-            </div>
-          </div>
+          )}
         </div>
         <div className="flex items-center h-full space-x-3 lg:space-x-6">
           <Dropdown menu={isAnonymousUser(currentUser) ? GuestMenu : UserMenu}>

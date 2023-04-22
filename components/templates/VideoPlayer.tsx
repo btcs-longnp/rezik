@@ -14,10 +14,8 @@ import PlayerStateRepository, {
   SnapshotReactionHandler,
 } from '../../services/firestore/PlayerStateRepository'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
-import Button from '../atoms/buttons/Button'
-import { IoExpand } from 'react-icons/io5'
 import { playlistStore } from '../../stores/playlist'
+import useSnapshotRoom from '../../services/room/useSnapshotRoom'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const initialPos = {
@@ -40,8 +38,9 @@ const VideoPlayer = () => {
   const [playerProps, playerCtrl] = useSpring(() => ({ from: initialPos }), [])
   const shouldShowPlayer = router.route.startsWith('/r/[id]')
   const roomId = shouldShowPlayer ? (router.query.id as string) : undefined
-  const isMiniPlayer = router.route !== '/r/[id]'
   const livingRoom = `/r/${roomId}`
+
+  useSnapshotRoom(roomId)
 
   const playerRepo = useMemo(() => {
     if (typeof roomId === 'undefined') {
@@ -217,16 +216,7 @@ const VideoPlayer = () => {
     <div className={`${!shouldShowPlayer ? 'hidden' : ''}`}>
       <ReactionPool elementRef={playerRef} />
       <animated.div ref={playerRef} style={playerProps}>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 invisible group-hover:visible">
-          {isMiniPlayer && (
-            <Link href={livingRoom}>
-              <Button type="primary" size="large">
-                <IoExpand className="mr-3 text-lg" />
-                Expand
-              </Button>
-            </Link>
-          )}
-        </div>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 invisible group-hover:visible"></div>
         {curSongReq && (
           <ReactPlayer
             ref={player}
