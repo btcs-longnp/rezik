@@ -1,3 +1,12 @@
+export const allowReactions = [
+  'haha',
+  'heart',
+  'sad',
+  'angry',
+  'surprise',
+  'wry',
+]
+
 export type ReactionType =
   | 'haha'
   | 'heart'

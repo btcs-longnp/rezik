@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 import { getAnonymousUser } from '../../models/user/User'
 import { currentUserStore } from '../../stores/currentUser'
-import { getAccountFromLocal } from '../simpleAuth/localAccount'
+import { getAccountFromLocal } from './localAccount'
 
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserStore)
