@@ -5,18 +5,19 @@ import {
   IoPersonOutline,
   IoWarningOutline,
 } from 'react-icons/io5'
-import { Account } from '../../../models/account/Account'
-import { isAnonymousUser } from '../../../models/user/User'
-import { getAccountFromLocal } from '../../../services/simpleAuth/localAccount'
-import { useAuth } from '../../../services/simpleAuth/useAuth'
+import { Account } from '@/models/account/Account'
+import { isAnonymousUser } from '@/models/user/User'
+import { getAccountFromLocal } from '@/services/simpleAuth/localAccount'
+import { useAuth } from '@/services/simpleAuth/useAuth'
+import { getAvatarString } from '@/services/utils/user'
+import Link from 'next/link'
+
 import CopyButton from '../../atoms/buttons/CopyButton'
 import Dropdown from '../../atoms/Dropdown'
 import Menu, { MenuItem } from '../../atoms/Menu'
 import { openModal } from '../../atoms/Modal'
 import SignIn from '../SignIn'
 import SignUpAndProfile from '../SignUpAndProfile'
-import { getAvatarString } from '../../../services/utils/user'
-import Link from 'next/link'
 
 export interface HeaderProps {
   page?: 'player' | 'search'

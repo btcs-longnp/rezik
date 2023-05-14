@@ -1,27 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { NextPage, NextPageContext } from 'next'
 
-import { newSongRequest } from '../../../../models/songRequest/SongRequest'
-import PlaylistBox from '../../../../components/templates/playlistBox/PlaylistBox'
+import { newSongRequest } from '@/models/songRequest/SongRequest'
+import PlaylistBox from '@com/templates/playlistBox/PlaylistBox'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import RoomHeader from '../../../../components/templates/headers/RoomHeader'
-import Song, { fromYoutubeVideo } from '../../../../models/song/Song'
-import SongCardSimple from '../../../../components/organisms/SongCardSimple'
-import { playlistStore } from '../../../../stores/playlist'
-import { currentUserStore } from '../../../../stores/currentUser'
-import { pushSongRequest } from '../../../../models/songRequest/Playlist'
-import PlaylistRepository from '../../../../services/firestore/PlaylistRepository'
-import {
-  getYoutubeVideos,
-  searchYoutubeVideo,
-} from '../../../../services/api/youtube'
-import { YouTubeVideo } from '../../../../models/youtube/YoutubeVideo'
-import { searchQueryStore } from '../../../../stores/search'
+import RoomHeader from '@com/templates/headers/RoomHeader'
+import Song, { fromYoutubeVideo } from '@/models/song/Song'
+import SongCardSimple from '@com/organisms/SongCardSimple'
+import { playlistStore } from '@/stores/playlist'
+import { currentUserStore } from '@/stores/currentUser'
+import { pushSongRequest } from '@/models/songRequest/Playlist'
+import PlaylistRepository from '@/services/firestore/PlaylistRepository'
+import { getYoutubeVideos, searchYoutubeVideo } from '@/services/api/youtube'
+import { YouTubeVideo } from '@/models/youtube/YoutubeVideo'
+import { searchQueryStore } from '@/stores/search'
 import { useRouter } from 'next/router'
-import { getRoomById } from '../../../../services/room/room'
-import { RoomPublic } from '../../../../models/room/Room'
-import { toRoomPublic } from '../../../../models/room/transform'
-import RoomHead from '../../../../components/atoms/heads/RoomHead'
+import { getRoomById } from '@/services/room/room'
+import { RoomPublic } from '@/models/room/Room'
+import { toRoomPublic } from '@/models/room/transform'
+import RoomHead from '@com/atoms/heads/RoomHead'
 
 const youtubeVideoURLRegex =
   /^(?:(?:https:\/\/)?(?:www.)?youtube.com\/watch\?v=(.*?)(?=&|$).*)|(?:(?:https:\/\/)?(?:.*?)\/(.*?)$)/

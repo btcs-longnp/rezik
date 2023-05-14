@@ -1,5 +1,5 @@
 import { atom } from 'recoil'
-import SongRequest from '../models/songRequest/SongRequest'
+import SongRequest from '@/models/songRequest/SongRequest'
 
 export const isPlayingStore = atom<boolean>({
   key: 'isPlayingStore',

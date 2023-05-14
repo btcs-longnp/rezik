@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactPlayer from 'react-player'
 import { useSpring, animated } from '@react-spring/web'
-
-import { playerEvent } from '../../models/eventEmitter/player'
+import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
-import { curSongReqStore, isPlayingStore } from '../../stores/player'
-import ReactionPool from '../../components/templates/ReactionPool'
+import { playerEvent } from '@/models/eventEmitter/player'
+import { curSongReqStore, isPlayingStore } from '@/stores/player'
 import {
   emitAddReaction,
   emitClearReaction,
-} from '../../services/emitter/reactionEmitter'
+} from '@/services/emitter/reactionEmitter'
 import PlayerStateRepository, {
   SnapshotReactionHandler,
-} from '../../services/firestore/PlayerStateRepository'
-import { useRouter } from 'next/router'
-import { playlistStore } from '../../stores/playlist'
+} from '@/services/firestore/PlayerStateRepository'
+import { playlistStore } from '@/stores/playlist'
+
+import ReactionPool from '../../components/templates/ReactionPool'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const initialPos = {

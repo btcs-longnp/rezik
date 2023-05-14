@@ -2,13 +2,14 @@ import { nanoid } from 'nanoid'
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoCheckmarkCircle } from 'react-icons/io5'
 import { useRecoilState } from 'recoil'
-import { Account } from '../../models/account/Account'
-import { isAnonymousUser, newUser } from '../../models/user/User'
+import { Account } from '@/models/account/Account'
+import { isAnonymousUser, newUser } from '@/models/user/User'
 import {
   getAccountFromLocal,
   saveAccountToLocal,
-} from '../../services/simpleAuth/localAccount'
-import { currentUserStore } from '../../stores/currentUser'
+} from '@/services/simpleAuth/localAccount'
+import { currentUserStore } from '@/stores/currentUser'
+
 import Button from '../atoms/buttons/Button'
 import Input from '../atoms/Input'
 
