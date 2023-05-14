@@ -1,5 +1,5 @@
 {
-  "name": "rezik",
+  "name": "play-isling",
   "private": true,
   "scripts": {
     "dev": "next dev",

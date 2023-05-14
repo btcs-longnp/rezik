@@ -15,7 +15,6 @@ import PlayerStateRepository, {
 } from '../../services/firestore/PlayerStateRepository'
 import { useRouter } from 'next/router'
 import { playlistStore } from '../../stores/playlist'
-import useSnapshotRoom from '../../services/room/useSnapshotRoom'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const initialPos = {
@@ -40,8 +39,6 @@ const VideoPlayer = () => {
   const roomId = shouldShowPlayer ? (router.query.id as string) : undefined
   const livingRoom = `/r/${roomId}`
 
-  useSnapshotRoom(roomId)
-
   const playerRepo = useMemo(() => {
     if (typeof roomId === 'undefined') {
       return undefined
@@ -50,10 +47,9 @@ const VideoPlayer = () => {
     return new PlayerStateRepository(roomId)
   }, [roomId])
 
-  const onReady = () => {
-    console.log('player: onReady')
-    setIsPlaying(true)
-  }
+  useEffect(() => {
+    console.log('isPlaying:', isPlaying)
+  }, [isPlaying])
 
   const handleVideoEndOrError = () => {
     playerEvent.emit('ended')
@@ -134,7 +130,8 @@ const VideoPlayer = () => {
       return
     }
 
-    player.current.seekTo(0)
+    // player.current.seekTo(0)
+    // console.log('seeked to 0')
   }, [curSongReq])
 
   useEffect(() => {
@@ -227,7 +224,6 @@ const VideoPlayer = () => {
             onPause={onPause}
             onEnded={handleVideoEndOrError}
             onError={handleVideoEndOrError}
-            onReady={onReady}
             width="100%"
             height="100%"
           />

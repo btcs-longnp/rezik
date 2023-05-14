@@ -20,9 +20,9 @@ import SongRequest, {
 } from '../../../models/songRequest/SongRequest'
 import { getAnonymousUser } from '../../../models/user/User'
 import { playerEvent } from '../../../models/eventEmitter/player'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import { playlistStore } from '../../../stores/playlist'
-import { curSongReqStore } from '../../../stores/player'
+import { curSongReqStore, isPlayingStore } from '../../../stores/player'
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -52,10 +52,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 }) => {
   const [playlist, setPlaylist] = useRecoilState<Playlist>(playlistStore)
   const [playerState, setPlayerState] = useState<PlayerState>()
+  const setIsPlaying = useSetRecoilState(isPlayingStore)
   const [isSync, setIsSync] = useState(true)
   const [curSongReq, setCurSongReq] = useRecoilState(curSongReqStore)
   const songReqIndex = useRef(0)
-  const songReqTotal = useRef(0)
+  const songReqTotal = useRef(playlist.list.length)
   const syncFirstTimeDone = useRef(false)
   const loadPlaylistFirstTimeDone = useRef(false)
   const shadowPlayerState = useRef(playerState)
@@ -100,6 +101,8 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   }, [playerRepo, playlist.list, setCurSongReq])
 
   const playBySongReqId = (songReqId: string) => {
+    setIsPlaying(true)
+
     const idx = playlist.list.findIndex((songReq) => songReq.id === songReqId)
 
     songReqIndex.current = Math.max(0, idx)
