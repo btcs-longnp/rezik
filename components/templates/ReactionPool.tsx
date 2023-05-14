@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { animated, useSpring, easings } from '@react-spring/web'
 import { FC, RefObject, useEffect, useRef, useState } from 'react'
-import Reaction, { ReactionType } from '../../models/Reaction'
-import { listenAddReaction } from '../../services/emitter/reactionEmitter'
+import Reaction, { ReactionType } from '@/models/Reaction'
+import { listenAddReaction } from '@/services/emitter/reactionEmitter'
+
 import ReactionIcon from '../atoms/ReactionIcon'
 
 export interface ReactionBubbleProps {

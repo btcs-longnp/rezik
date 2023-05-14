@@ -8,22 +8,23 @@ import {
   IoTvOutline,
   IoWarningOutline,
 } from 'react-icons/io5'
-import { Account } from '../../../models/account/Account'
-import { isAnonymousUser } from '../../../models/user/User'
-import { getAccountFromLocal } from '../../../services/simpleAuth/localAccount'
-import { useAuth } from '../../../services/simpleAuth/useAuth'
+import { Account } from '@/models/account/Account'
+import { isAnonymousUser } from '@/models/user/User'
+import { getAccountFromLocal } from '@/services/simpleAuth/localAccount'
+import { useAuth } from '@/services/simpleAuth/useAuth'
+import { getAvatarString } from '@/services/utils/user'
+import Link from 'next/link'
+import { useRecoilState } from 'recoil'
+import { searchQueryStore } from '@/stores/search'
+import { RoomPublic } from '@/models/room/Room'
+
+import IconButton from '../../atoms/buttons/IconButton'
 import CopyButton from '../../atoms/buttons/CopyButton'
 import Dropdown from '../../atoms/Dropdown'
 import Menu, { MenuItem } from '../../atoms/Menu'
 import { openModal } from '../../atoms/Modal'
 import SignIn from '../SignIn'
 import SignUpAndProfile from '../SignUpAndProfile'
-import { getAvatarString } from '../../../services/utils/user'
-import Link from 'next/link'
-import IconButton from '../../atoms/buttons/IconButton'
-import { useRecoilState } from 'recoil'
-import { searchQueryStore } from '../../../stores/search'
-import { RoomPublic } from '../../../models/room/Room'
 
 export interface HeaderProps {
   room: RoomPublic

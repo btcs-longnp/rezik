@@ -8,7 +8,8 @@ import {
   IoTrashBin,
 } from 'react-icons/io5'
 import { useRecoilState } from 'recoil'
-import { isPlayingStore } from '../../stores/player'
+import { isPlayingStore } from '@/stores/player'
+
 import IconButton from '../atoms/buttons/IconButton'
 
 export interface MusicControllerOptions {

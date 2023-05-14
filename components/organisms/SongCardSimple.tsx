@@ -1,9 +1,8 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { IoAdd, IoCheckmarkCircle } from 'react-icons/io5'
 import Image from 'next/image'
-
-import Song from '../../models/song/Song'
-import { truncateWithEllipsis } from '../../services/utils/string'
+import Song from '@/models/song/Song'
+import { truncateWithEllipsis } from '@/services/utils/string'
 
 export interface SongCardProps {
   song: Song

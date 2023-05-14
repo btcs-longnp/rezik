@@ -1,17 +1,16 @@
 import type { NextPage } from 'next'
-import HomeLayout from '../components/templates/layouts/HomeLayout'
+import HomeLayout from '@com/templates/layouts/HomeLayout'
 import Link from 'next/link'
 import { IoPersonOutline } from 'react-icons/io5'
 import { useRecoilValue } from 'recoil'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-
-import { currentUserStore } from '../stores/currentUser'
-import { isAnonymousUser } from '../models/user/User'
-import { getAvatarString } from '../services/utils/user'
-import Roll from '../components/organisms/Roll'
-import { Room } from '../models/room/Room'
-import { getForYouRooms } from '../services/room/room'
+import { currentUserStore } from '@/stores/currentUser'
+import { isAnonymousUser } from '@/models/user/User'
+import { getAvatarString } from '@/services/utils/user'
+import Roll from '@com/organisms/Roll'
+import { Room } from '@/models/room/Room'
+import { getForYouRooms } from '@/services/room/room'
 
 const Home: NextPage = () => {
   const currentUser = useRecoilValue(currentUserStore)

@@ -1,28 +1,26 @@
 import { useRef, useEffect, useState, FC, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
-
-import { newSong } from '../../../models/song/Song'
-import PlaylistRepository from '../../../services/firestore/PlaylistRepository'
-import Playlist, { newPlaylist } from '../../../models/songRequest/Playlist'
-import MusicController, {
-  MusicControllerOptions,
-} from '../../organisms/MusicController'
-import SongCard from '../../organisms/SongCard'
-import PlayerStateRepository from '../../../services/firestore/PlayerStateRepository'
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import { newSong } from '@/models/song/Song'
+import PlaylistRepository from '@/services/firestore/PlaylistRepository'
+import Playlist, { newPlaylist } from '@/models/songRequest/Playlist'
+import PlayerStateRepository from '@/services/firestore/PlayerStateRepository'
 import {
   newPlayerState,
   PlayerState,
   updatePlayerState,
-} from '../../../models/playerState/playerState'
-import SongRequest, {
-  newSongRequest,
-} from '../../../models/songRequest/SongRequest'
-import { getAnonymousUser } from '../../../models/user/User'
-import { playerEvent } from '../../../models/eventEmitter/player'
-import { useRecoilState } from 'recoil'
-import { playlistStore } from '../../../stores/playlist'
-import { curSongReqStore } from '../../../stores/player'
+} from '@/models/playerState/playerState'
+import SongRequest, { newSongRequest } from '@/models/songRequest/SongRequest'
+import { getAnonymousUser } from '@/models/user/User'
+import { playerEvent } from '@/models/eventEmitter/player'
+import { playlistStore } from '@/stores/playlist'
+import { curSongReqStore, isPlayingStore } from '@/stores/player'
+
+import MusicController, {
+  MusicControllerOptions,
+} from '../../organisms/MusicController'
+import SongCard from '../../organisms/SongCard'
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -52,10 +50,11 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
 }) => {
   const [playlist, setPlaylist] = useRecoilState<Playlist>(playlistStore)
   const [playerState, setPlayerState] = useState<PlayerState>()
+  const setIsPlaying = useSetRecoilState(isPlayingStore)
   const [isSync, setIsSync] = useState(true)
   const [curSongReq, setCurSongReq] = useRecoilState(curSongReqStore)
   const songReqIndex = useRef(0)
-  const songReqTotal = useRef(0)
+  const songReqTotal = useRef(playlist.list.length)
   const syncFirstTimeDone = useRef(false)
   const loadPlaylistFirstTimeDone = useRef(false)
   const shadowPlayerState = useRef(playerState)
@@ -100,6 +99,8 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   }, [playerRepo, playlist.list, setCurSongReq])
 
   const playBySongReqId = (songReqId: string) => {
+    setIsPlaying(true)
+
     const idx = playlist.list.findIndex((songReq) => songReq.id === songReqId)
 
     songReqIndex.current = Math.max(0, idx)

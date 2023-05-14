@@ -1,8 +1,9 @@
 import { FC, useState } from 'react'
 import { useSetRecoilState } from 'recoil'
-import { Account } from '../../models/account/Account'
-import { saveAccountToLocal } from '../../services/simpleAuth/localAccount'
-import { currentUserStore } from '../../stores/currentUser'
+import { Account } from '@/models/account/Account'
+import { saveAccountToLocal } from '@/services/simpleAuth/localAccount'
+import { currentUserStore } from '@/stores/currentUser'
+
 import Button from '../atoms/buttons/Button'
 import Input from '../atoms/Input'
 import { closeModal, openModal } from '../atoms/Modal'

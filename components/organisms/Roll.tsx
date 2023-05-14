@@ -7,8 +7,9 @@ import {
   useState,
 } from 'react'
 import { IoChevronBackOutline, IoChevronForwardOutline } from 'react-icons/io5'
+import { getElementByScrollOffsetLeft } from '@/services/utils/html'
+
 import IconButtonOutline from '../atoms/buttons/IconButtonOutline'
-import { getElementByScrollOffsetLeft } from '../../services/utils/html'
 
 export interface RollProps {
   title?: ReactElement

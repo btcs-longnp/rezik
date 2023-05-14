@@ -1,21 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactPlayer from 'react-player'
 import { useSpring, animated } from '@react-spring/web'
-
-import { playerEvent } from '../../models/eventEmitter/player'
+import { useRouter } from 'next/router'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
-import { curSongReqStore, isPlayingStore } from '../../stores/player'
-import ReactionPool from '../../components/templates/ReactionPool'
+import { playerEvent } from '@/models/eventEmitter/player'
+import { curSongReqStore, isPlayingStore } from '@/stores/player'
 import {
   emitAddReaction,
   emitClearReaction,
-} from '../../services/emitter/reactionEmitter'
+} from '@/services/emitter/reactionEmitter'
 import PlayerStateRepository, {
   SnapshotReactionHandler,
-} from '../../services/firestore/PlayerStateRepository'
-import { useRouter } from 'next/router'
-import { playlistStore } from '../../stores/playlist'
-import useSnapshotRoom from '../../services/room/useSnapshotRoom'
+} from '@/services/firestore/PlayerStateRepository'
+import { playlistStore } from '@/stores/playlist'
+
+import ReactionPool from '../../components/templates/ReactionPool'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const initialPos = {
@@ -40,8 +39,6 @@ const VideoPlayer = () => {
   const roomId = shouldShowPlayer ? (router.query.id as string) : undefined
   const livingRoom = `/r/${roomId}`
 
-  useSnapshotRoom(roomId)
-
   const playerRepo = useMemo(() => {
     if (typeof roomId === 'undefined') {
       return undefined
@@ -50,10 +47,9 @@ const VideoPlayer = () => {
     return new PlayerStateRepository(roomId)
   }, [roomId])
 
-  const onReady = () => {
-    console.log('player: onReady')
-    setIsPlaying(true)
-  }
+  useEffect(() => {
+    console.log('isPlaying:', isPlaying)
+  }, [isPlaying])
 
   const handleVideoEndOrError = () => {
     playerEvent.emit('ended')
@@ -134,7 +130,8 @@ const VideoPlayer = () => {
       return
     }
 
-    player.current.seekTo(0)
+    // player.current.seekTo(0)
+    // console.log('seeked to 0')
   }, [curSongReq])
 
   useEffect(() => {
@@ -227,7 +224,6 @@ const VideoPlayer = () => {
             onPause={onPause}
             onEnded={handleVideoEndOrError}
             onError={handleVideoEndOrError}
-            onReady={onReady}
             width="100%"
             height="100%"
           />
