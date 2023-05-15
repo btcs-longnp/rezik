@@ -1,3 +1,4 @@
+'use client'
 import EventEmitter from 'events'
 import { FC, ReactElement, useCallback, useEffect, useState } from 'react'
 import { IoClose } from 'react-icons/io5'

@@ -1,5 +1,4 @@
-import type { NextPage } from 'next'
-import HomeLayout from '@com/templates/layouts/HomeLayout'
+'use client'
 import Link from 'next/link'
 import { IoPersonOutline } from 'react-icons/io5'
 import { useRecoilValue } from 'recoil'
@@ -11,8 +10,9 @@ import { getAvatarString } from '@/services/utils/user'
 import Roll from '@com/organisms/Roll'
 import { Room } from '@/models/room/Room'
 import { getForYouRooms } from '@/services/room/room'
+import HomeHeader from '@/components/templates/headers/HomeHeader'
 
-const Home: NextPage = () => {
+const Page = () => {
   const currentUser = useRecoilValue(currentUserStore)
   const [forYouRooms, setForYouRooms] = useState<Room[]>([])
 
@@ -22,7 +22,11 @@ const Home: NextPage = () => {
   }, [])
 
   return (
-    <HomeLayout>
+    <>
+      <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
+        <HomeHeader />
+      </header>
+      <div className="h-28" />
       <div className="mx-32">
         <Roll
           title={
@@ -71,8 +75,8 @@ const Home: NextPage = () => {
           ))}
         </Roll>
       </div>
-    </HomeLayout>
+    </>
   )
 }
 
-export default Home
+export default Page
