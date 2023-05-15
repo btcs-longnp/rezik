@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { getRoomById } from '@/services/room/room'
 import { toRoomPublic } from '@/models/room/transform'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import RoomHeaderWrapper from './_components/RoomHeaderWrapper'
-import PlayListBoxWrapper from './_components/PlaylistBoxWrapper'
 
 const websiteURL = process.env.NEXT_PUBLIC_WEBSITE_URL
 
@@ -44,9 +43,12 @@ export async function generateMetadata({
 }
 
 export default function RoomLayout(
-  props: PropsWithChildren<{ params: Record<string, string> }>
+  props: PropsWithChildren<{
+    params: Record<string, string>
+    playlist: ReactNode
+  }>
 ) {
-  const { children, params } = props
+  const { children, params, playlist } = props
   const room = getRoomById(params.id)
   if (!room) {
     notFound()
@@ -59,7 +61,7 @@ export default function RoomLayout(
           <RoomHeaderWrapper room={room} isShowRoom />
         </header>
         <div className="fixed top-[4.5rem] right-6 overflow-hidden lg:rounded-xl lg:h-[calc(100vh-6rem)] lg:w-[26rem]">
-          <PlayListBoxWrapper roomId={room.id} />
+          {playlist}
         </div>
         {children}
       </div>
