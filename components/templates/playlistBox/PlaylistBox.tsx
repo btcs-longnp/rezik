@@ -1,5 +1,6 @@
+'use client'
 import { useRef, useEffect, useState, FC, useCallback, useMemo } from 'react'
-import { useRouter } from 'next/router'
+import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { newSong } from '@/models/song/Song'
@@ -61,9 +62,9 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const shadowIsSync = useRef(isSync)
   const isMouseEnterPlaylist = useRef(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
+  const params = useParams()
 
-  const roomId = (router.query.id as string) || 'isling'
+  const roomId = (params?.id as string) || 'isling'
 
   const playlistRepo = useMemo(() => new PlaylistRepository(roomId), [roomId])
   const playerRepo = useMemo(() => new PlayerStateRepository(roomId), [roomId])

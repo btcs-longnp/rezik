@@ -1,3 +1,4 @@
+'use client'
 import { FC, useEffect, useRef, useState } from 'react'
 import {
   IoChevronBack,
@@ -16,7 +17,7 @@ import { getAvatarString } from '@/services/utils/user'
 import Link from 'next/link'
 import { useRecoilState } from 'recoil'
 import { searchQueryStore } from '@/stores/search'
-import { RoomPublic } from '@/models/room/Room'
+import { Room } from '@/models/room/Room'
 
 import IconButton from '../../atoms/buttons/IconButton'
 import CopyButton from '../../atoms/buttons/CopyButton'
@@ -26,8 +27,8 @@ import { openModal } from '../../atoms/Modal'
 import SignIn from '../SignIn'
 import SignUpAndProfile from '../SignUpAndProfile'
 
-export interface HeaderProps {
-  room: RoomPublic
+export interface RoomHeaderProps {
+  room?: Room
   backBtn?: {
     url: string
     title: string
@@ -35,7 +36,7 @@ export interface HeaderProps {
   isShowRoom?: boolean
 }
 
-const RoomHeader: FC<HeaderProps> = ({ room, backBtn, isShowRoom }) => {
+const RoomHeader: FC<RoomHeaderProps> = ({ room, backBtn, isShowRoom }) => {
   const { currentUser, signOut } = useAuth()
   const [account, setAccount] = useState<Account>()
   const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
@@ -186,7 +187,7 @@ const RoomHeader: FC<HeaderProps> = ({ room, backBtn, isShowRoom }) => {
             <div className="max-w-[192px] flex items-center bg-primary-light rounded px-3 h-8">
               <IoTvOutline className="text-lg text-secondary/80" />
               <div className="truncate text-ellipsis ml-2 font-light text-secondary/90 text-sm">
-                {room.name}
+                {room?.name}
               </div>
             </div>
           )}

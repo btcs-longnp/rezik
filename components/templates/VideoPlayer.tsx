@@ -1,7 +1,8 @@
+'use client'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactPlayer from 'react-player'
 import { useSpring, animated } from '@react-spring/web'
-import { useRouter } from 'next/router'
+import { useParams, usePathname } from 'next/navigation'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import { playerEvent } from '@/models/eventEmitter/player'
 import { curSongReqStore, isPlayingStore } from '@/stores/player'
@@ -14,7 +15,7 @@ import PlayerStateRepository, {
 } from '@/services/firestore/PlayerStateRepository'
 import { playlistStore } from '@/stores/playlist'
 
-import ReactionPool from '../../components/templates/ReactionPool'
+import ReactionPool from '@com/templates/ReactionPool'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
 const initialPos = {
@@ -27,7 +28,8 @@ const initialPos = {
 }
 
 const VideoPlayer = () => {
-  const router = useRouter()
+  const pathName = usePathname()
+  const params = useParams()
   const player = useRef<ReactPlayer>(null)
   const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore)
   const curSongReq = useRecoilValue(curSongReqStore)
@@ -35,9 +37,10 @@ const VideoPlayer = () => {
   const resetPlaylist = useResetRecoilState(playlistStore)
   const playerRef = useRef<HTMLDivElement>(null)
   const [playerProps, playerCtrl] = useSpring(() => ({ from: initialPos }), [])
-  const shouldShowPlayer = router.route.startsWith('/r/[id]')
-  const roomId = shouldShowPlayer ? (router.query.id as string) : undefined
-  const livingRoom = `/r/${roomId}`
+  const shouldShowPlayer =
+    pathName?.startsWith('/r/') || pathName?.startsWith('/r-blue/')
+  const roomId = shouldShowPlayer ? (params?.id as string) : undefined
+  const isLivingRoom = pathName === `/r/${params?.id}`
 
   const playerRepo = useMemo(() => {
     if (typeof roomId === 'undefined') {
@@ -47,9 +50,10 @@ const VideoPlayer = () => {
     return new PlayerStateRepository(roomId)
   }, [roomId])
 
-  useEffect(() => {
-    console.log('isPlaying:', isPlaying)
-  }, [isPlaying])
+  const onReady = () => {
+    // play video at 0s
+    player.current?.seekTo(0)
+  }
 
   const handleVideoEndOrError = () => {
     playerEvent.emit('ended')
@@ -126,15 +130,6 @@ const VideoPlayer = () => {
   )
 
   useEffect(() => {
-    if (!player.current) {
-      return
-    }
-
-    // player.current.seekTo(0)
-    // console.log('seeked to 0')
-  }, [curSongReq])
-
-  useEffect(() => {
     if (!playerRepo) {
       return
     }
@@ -152,7 +147,7 @@ const VideoPlayer = () => {
   }, [playerRepo])
 
   useEffect(() => {
-    if (router.route === '/r/[id]') {
+    if (isLivingRoom) {
       document.onscroll = () => {
         clonePositionAndClass(
           playerRef.current,
@@ -163,7 +158,7 @@ const VideoPlayer = () => {
         )
       }
     }
-  }, [clonePositionAndClass, livingRoom, playerCtrl, router.route])
+  }, [clonePositionAndClass, playerCtrl, isLivingRoom])
 
   const videoPlaceholderSizeChange: ResizeObserverCallback = useCallback(() => {
     clonePositionAndClass(
@@ -199,7 +194,7 @@ const VideoPlayer = () => {
         }
       })
     }
-  }, [videoPlaceholderSizeChange, router.route])
+  }, [videoPlaceholderSizeChange, pathName])
 
   // clear data
   useEffect(() => {
@@ -220,6 +215,7 @@ const VideoPlayer = () => {
             url={youtubeVideoBaseUrl + curSongReq.song.id}
             playing={isPlaying}
             controls={true}
+            onReady={onReady}
             onPlay={onPlay}
             onPause={onPause}
             onEnded={handleVideoEndOrError}
