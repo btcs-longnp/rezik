@@ -1,52 +1,26 @@
-import { ChangeEvent, FC, HTMLProps, ReactElement } from 'react'
+import * as React from 'react'
 
-export interface InputProps extends Omit<HTMLProps<HTMLInputElement>, 'label'> {
-  label?: string | ReactElement
-  description?: string
-  isError?: boolean
-  onTextChange?: (text: string) => void
-  addonBefore?: ReactElement
-  addonAfter?: ReactElement
-}
+import { cn } from '@/lib/utils'
 
-const Input: FC<InputProps> = (props) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (props.onTextChange) {
-      props.onTextChange(e.target.value)
-    }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          'flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
   }
+)
+Input.displayName = 'Input'
 
-  return (
-    <div>
-      {props.label && <div className="mb-1 text-sm">{props.label}</div>}
-      <div
-        className={`
-        grid grid-cols-[auto_1fr_auto] 
-        ${props.className} 
-        px-3 py-3 rounded border ${
-          props.isError ? 'border-rose-400' : 'border-primary-light'
-        } bg-primary/70
-      `}
-      >
-        <div className="h-full">{props.addonBefore}</div>
-        <input
-          {...props}
-          className="w-full h-full outline-none bg-transparent"
-          onChange={handleChange}
-        />
-        <div className="h-full">{props.addonAfter}</div>
-      </div>
-      {props.description && (
-        <div
-          className={`mt-0.5 text-xs ${
-            props.isError ? 'text-rose-400' : 'text-secondary/60'
-          }`}
-        >
-          {props.description}
-        </div>
-      )}
-    </div>
-  )
-}
-
-export default Input
+export { Input }
