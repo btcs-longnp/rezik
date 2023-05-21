@@ -11,7 +11,7 @@ import {
 import { currentUserStore } from '@/stores/currentUser'
 
 import { Button } from '../atoms/button'
-import { Input } from '../atoms/input2'
+import { Input } from '../atoms/input'
 import { Label } from '../atoms/label'
 import { openModal } from '../organisms/GlobalDialog'
 import SignIn from './SignIn'

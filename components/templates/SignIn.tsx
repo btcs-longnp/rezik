@@ -5,7 +5,7 @@ import { saveAccountToLocal } from '@/services/simpleAuth/localAccount'
 import { currentUserStore } from '@/stores/currentUser'
 
 import { Button } from '../atoms/button'
-import { Input } from '../atoms/input2'
+import { Input } from '../atoms/input'
 import { closeModal, openModal } from '../organisms/GlobalDialog'
 import SignUpAndProfile from './SignUpAndProfile'
 import { ChangeEvent } from 'react'
