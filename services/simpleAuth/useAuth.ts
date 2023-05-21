@@ -1,11 +1,14 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { getAnonymousUser } from '../../models/user/User'
-import { currentUserStore } from '../../stores/currentUser'
+import { getAnonymousUser, isAnonymousUser } from '@/models/user/User'
+import { currentUserStore } from '@/stores/currentUser'
+import { Account } from '@/models/account/Account'
+
 import { getAccountFromLocal } from './localAccount'
 
 export const useAuth = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserStore)
+  const [account, setAccount] = useState<Account>()
 
   const signOut = useCallback(() => {
     setCurrentUser(getAnonymousUser())
@@ -18,5 +21,16 @@ export const useAuth = () => {
     setCurrentUser(account?.user || getAnonymousUser())
   }, [setCurrentUser])
 
-  return { currentUser, signOut }
+  useEffect(() => {
+    if (!isAnonymousUser(currentUser)) {
+      const acc = getAccountFromLocal()
+
+      setAccount(acc)
+      return
+    }
+
+    setAccount(undefined)
+  }, [currentUser])
+
+  return { currentUser, signOut, account }
 }

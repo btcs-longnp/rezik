@@ -1,8 +1,11 @@
 'use client'
 import { FC, useEffect, useRef, useState } from 'react'
-import { IoChevronBack, IoClose, IoTvOutline } from 'react-icons/io5'
-import User from '@/models/user/User'
-import { getAvatarString } from '@/services/utils/user'
+import {
+  IoChevronBack,
+  IoClose,
+  IoPersonOutline,
+  IoTvOutline,
+} from 'react-icons/io5'
 import Link from 'next/link'
 import { useRecoilState } from 'recoil'
 import { searchQueryStore } from '@/stores/search'
@@ -14,23 +17,21 @@ import {
 import { Avatar, AvatarFallback } from '@/components/atoms/avatar'
 
 import IconButton from '../../atoms/buttons/IconButton'
-import { UserDropdownContent } from './UserDropdownContent'
+import { GuestDropdownContent } from './UserDropdownContent'
 
-export interface RoomHeaderProps {
+export interface RoomHeaderForGuestProps {
   room?: Room
   backBtn?: {
     url: string
     title: string
   }
   isShowRoom?: boolean
-  currentUser: User
 }
 
-const RoomHeader: FC<RoomHeaderProps> = ({
+const RoomHeaderForGuest: FC<RoomHeaderForGuestProps> = ({
   room,
   backBtn,
   isShowRoom,
-  currentUser,
 }) => {
   const [searchQuery, setSearchQuery] = useRecoilState(searchQueryStore)
   const [keyword, setKeyword] = useState<string>(searchQuery)
@@ -108,11 +109,11 @@ const RoomHeader: FC<RoomHeaderProps> = ({
             <DropdownMenuTrigger asChild>
               <Avatar className="cursor-pointer">
                 <AvatarFallback>
-                  <div className="text-sm">{getAvatarString(currentUser)}</div>
+                  <IoPersonOutline />
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <UserDropdownContent />
+            <GuestDropdownContent />
           </DropdownMenu>
         </div>
       </div>
@@ -120,4 +121,4 @@ const RoomHeader: FC<RoomHeaderProps> = ({
   )
 }
 
-export default RoomHeader
+export default RoomHeaderForGuest

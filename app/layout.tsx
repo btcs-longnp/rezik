@@ -1,10 +1,11 @@
 import { Metadata } from 'next'
 import '@/styles/globals.css'
-import Modal from '@com/atoms/Modal'
+import GlobalDialog from '@/components/organisms/GlobalDialog'
 import VideoPlayer from '@com/templates/VideoPlayer'
 
 import Providers from './providers'
 import { PropsWithChildren } from 'react'
+import { Toaster } from '@/components/atoms/toaster'
 
 const websiteURL = process.env.NEXT_PUBLIC_WEBSITE_URL
 
@@ -30,9 +31,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren<unknown>) {
   return (
     <html lang="en">
-      <body>
+      <body className="dark">
         <Providers>
-          <Modal />
+          <GlobalDialog />
+          <Toaster />
           <VideoPlayer />
           <main>{children}</main>
         </Providers>

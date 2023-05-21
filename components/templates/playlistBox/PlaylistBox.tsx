@@ -22,6 +22,7 @@ import MusicController, {
   MusicControllerOptions,
 } from '../../organisms/MusicController'
 import SongCard from '../../organisms/SongCard'
+import { useToast } from '@/components/atoms/use-toast'
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -63,6 +64,7 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const isMouseEnterPlaylist = useRef(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const params = useParams()
+  const { toast } = useToast()
 
   const roomId = (params?.id as string) || 'isling'
 
@@ -130,7 +132,9 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
     await playlistRepo.removePlaylist()
     await playerRepo.removeController()
     setPlaylist(newPlaylist([], 0))
-    alert('Clear playlist successfully')
+    toast({
+      description: 'Clear this playlist successfully',
+    })
   }
 
   const handleMouseEnter = () => {

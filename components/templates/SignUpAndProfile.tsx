@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import { FC, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import { IoCheckmarkCircle } from 'react-icons/io5'
 import { useRecoilState } from 'recoil'
 import { Account } from '@/models/account/Account'
@@ -10,8 +10,11 @@ import {
 } from '@/services/simpleAuth/localAccount'
 import { currentUserStore } from '@/stores/currentUser'
 
-import Button from '../atoms/buttons/Button'
-import Input from '../atoms/Input'
+import { Button } from '../atoms/button'
+import { Input } from '../atoms/input'
+import { Label } from '../atoms/label'
+import { openModal } from '../organisms/GlobalDialog'
+import SignIn from './SignIn'
 
 const SignUpAndProfile: FC = () => {
   const [isDone, setIsDone] = useState(false)
@@ -20,7 +23,9 @@ const SignUpAndProfile: FC = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserStore)
   const isCreateAccount = useRef(isAnonymousUser(currentUser))
 
-  const changeName = (name: string) => {
+  const changeName = (event: ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.value
+
     if (name.length > 40) {
       return
     }
@@ -45,6 +50,13 @@ const SignUpAndProfile: FC = () => {
     }, 300)
   }
 
+  const openSignInModal = () => {
+    openModal({
+      title: 'Sign in',
+      body: <SignIn />,
+    })
+  }
+
   useEffect(() => {
     if (!isAnonymousUser(currentUser)) {
       setUser(currentUser)
@@ -64,7 +76,7 @@ const SignUpAndProfile: FC = () => {
   return (
     <div className="relative w-full h-full">
       {isDone && (
-        <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-green-700 bg-opacity-80 rounded z-10">
+        <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center rounded z-10">
           <IoCheckmarkCircle className="text-5xl" />
           <div className="text-2xl mt-8">
             {isCreateAccount.current
@@ -78,25 +90,31 @@ const SignUpAndProfile: FC = () => {
           isDone ? 'invisible' : 'visible'
         }`}
       >
-        <div className="flex items-center mt-8 mb-12 text-xl font-semibold">
-          {isCreateAccount.current ? 'Sign Up' : 'Your Profile'}
-        </div>
-        <div className="w-80 space-y-4">
-          <div>
+        <div className="w-96 space-y-4 mt-12">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
             <Input
               type="text"
+              name="name"
               autoFocus
               value={user.name}
-              onTextChange={changeName}
-              label="Name"
+              onChange={changeName}
             />
           </div>
         </div>
-        <div className="mt-10 mb-12">
-          <Button onClick={createAccount} size="large" type="primary">
+        <div className="mt-10 mb-4">
+          <Button variant="highlight" onClick={createAccount}>
             {isCreateAccount.current ? 'Sign up' : 'Save'}
           </Button>
         </div>
+        {isCreateAccount.current && (
+          <div className="flex items-center mb-12 text-secondary/80">
+            <div className="text-sm">Already have an account?</div>
+            <Button variant="link" size="sm" onClick={openSignInModal}>
+              Sign in
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

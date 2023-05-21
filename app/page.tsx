@@ -11,6 +11,8 @@ import Roll from '@com/organisms/Roll'
 import { Room } from '@/models/room/Room'
 import { getForYouRooms } from '@/services/room/room'
 import HomeHeader from '@/components/templates/headers/HomeHeader'
+import { Avatar, AvatarFallback } from '@/components/atoms/avatar'
+import HomeHeaderForGuest from '@/components/templates/headers/HomeHeaderForGuest'
 
 const Page = () => {
   const currentUser = useRecoilValue(currentUserStore)
@@ -24,20 +26,28 @@ const Page = () => {
   return (
     <>
       <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
-        <HomeHeader />
+        {isAnonymousUser(currentUser) ? (
+          <HomeHeaderForGuest />
+        ) : (
+          <HomeHeader currentUser={currentUser} />
+        )}
       </header>
       <div className="h-28" />
       <div className="mx-32">
         <Roll
           title={
             <div className="flex pb-2">
-              <div className="flex items-center justify-center w-16 h-16 font-light rounded-full bg-primary-light">
-                {isAnonymousUser(currentUser) ? (
-                  <IoPersonOutline className="text-2xl" />
-                ) : (
-                  <div className="text-2xl">{getAvatarString(currentUser)}</div>
-                )}
-              </div>
+              <Avatar className="w-16 h-16">
+                <AvatarFallback>
+                  {isAnonymousUser(currentUser) ? (
+                    <IoPersonOutline className="text-2xl" />
+                  ) : (
+                    <div className="text-sm">
+                      {getAvatarString(currentUser)}
+                    </div>
+                  )}
+                </AvatarFallback>
+              </Avatar>
               <div className="ml-4 h-full flex flex-col justify-between">
                 <div className="text-secondary/60 leading-none font-light">
                   {currentUser.name.toUpperCase()}

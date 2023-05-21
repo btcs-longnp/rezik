@@ -1,22 +1,20 @@
 import { FC } from 'react'
-import { getAvatarString } from '@/services/utils/user'
+import { IoPersonOutline } from 'react-icons/io5'
 import Link from 'next/link'
 
-import { UserDropdownContent } from './UserDropdownContent'
+import { GuestDropdownContent } from './UserDropdownContent'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
 } from '@/components/atoms/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/atoms/avatar'
-import User from '@/models/user/User'
 import { IslingLogo } from '@/components/atoms/logo'
 
 export interface HeaderProps {
   page?: 'player' | 'search'
-  currentUser: User
 }
 
-const HomeHeader: FC<HeaderProps> = ({ currentUser }) => {
+const HomeHeaderForGuest: FC<HeaderProps> = () => {
   return (
     <>
       <div className="fixed z-[999] left-1/2 -translate-x-1/2 h-14 flex justify-center items-center text-secondary">
@@ -28,10 +26,10 @@ const HomeHeader: FC<HeaderProps> = ({ currentUser }) => {
             Explore
           </Link>
           <Link href="/" className="text-lg font-semibold text-secondary/60">
-            Your room
+            Search
           </Link>
           <Link href="/" className="text-lg font-semibold text-secondary/60">
-            Search
+            Create account
           </Link>
         </div>
       </div>
@@ -46,11 +44,11 @@ const HomeHeader: FC<HeaderProps> = ({ currentUser }) => {
             <DropdownMenuTrigger asChild>
               <Avatar className="cursor-pointer">
                 <AvatarFallback>
-                  <div className="text-sm">{getAvatarString(currentUser)}</div>
+                  <IoPersonOutline />
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
-            <UserDropdownContent />
+            <GuestDropdownContent />
           </DropdownMenu>
         </div>
       </div>
@@ -58,4 +56,4 @@ const HomeHeader: FC<HeaderProps> = ({ currentUser }) => {
   )
 }
 
-export default HomeHeader
+export default HomeHeaderForGuest
