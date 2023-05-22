@@ -8,7 +8,7 @@ import {
   getAccountFromLocal,
   saveAccountToLocal,
 } from '@/services/simpleAuth/localAccount'
-import { currentUserStore } from '@/stores/currentUser'
+import { currentUserStore } from '@/stores/auth'
 
 import { Button } from '../atoms/button'
 import { Input } from '../atoms/input'

@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import ReactPlayer from 'react-player'
 import { useSpring, animated } from '@react-spring/web'
-import { useParams, usePathname } from 'next/navigation'
+import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil'
 import { playerEvent } from '@/models/eventEmitter/player'
 import { curSongReqStore, isPlayingStore } from '@/stores/player'
@@ -14,7 +14,6 @@ import PlayerStateRepository, {
   SnapshotReactionHandler,
 } from '@/services/firestore/PlayerStateRepository'
 import { playlistStore } from '@/stores/playlist'
-
 import ReactionPool from '@com/templates/ReactionPool'
 
 const youtubeVideoBaseUrl = 'https://www.youtube.com/watch?v='
@@ -30,6 +29,7 @@ const initialPos = {
 const VideoPlayer = () => {
   const pathName = usePathname()
   const params = useParams()
+  const searchParam = useSearchParams()
   const player = useRef<ReactPlayer>(null)
   const [isPlaying, setIsPlaying] = useRecoilState(isPlayingStore)
   const curSongReq = useRecoilValue(curSongReqStore)
@@ -41,6 +41,7 @@ const VideoPlayer = () => {
     pathName?.startsWith('/r/') || pathName?.startsWith('/r-blue/')
   const roomId = shouldShowPlayer ? (params?.id as string) : undefined
   const isLivingRoom = pathName === `/r/${params?.id}`
+  const isLightMode = !!searchParam.get('lightMode')
 
   const playerRepo = useMemo(() => {
     if (typeof roomId === 'undefined') {
@@ -208,7 +209,6 @@ const VideoPlayer = () => {
     <div className={`${!shouldShowPlayer ? 'hidden' : ''}`}>
       <ReactionPool elementRef={playerRef} />
       <animated.div ref={playerRef} style={playerProps}>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-40 invisible group-hover:visible"></div>
         {curSongReq && (
           <ReactPlayer
             ref={player}
@@ -222,6 +222,7 @@ const VideoPlayer = () => {
             onError={handleVideoEndOrError}
             width="100%"
             height="100%"
+            light={isLightMode}
           />
         )}
       </animated.div>

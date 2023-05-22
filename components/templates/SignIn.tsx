@@ -2,7 +2,7 @@ import { FC, useState } from 'react'
 import { useSetRecoilState } from 'recoil'
 import { Account } from '@/models/account/Account'
 import { saveAccountToLocal } from '@/services/simpleAuth/localAccount'
-import { currentUserStore } from '@/stores/currentUser'
+import { currentUserStore } from '@/stores/auth'
 
 import { Button } from '../atoms/button'
 import { Input } from '../atoms/input'
