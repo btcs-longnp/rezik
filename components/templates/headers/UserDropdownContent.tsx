@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
+  // DropdownMenuShortcut,
   DropdownMenuSub,
 } from '@/components/atoms/dropdown-menu'
 import { useAuth } from '@/services/simpleAuth/useAuth'
@@ -58,7 +58,7 @@ export function UserDropdownContent() {
         >
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
-          <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          {/* <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut> */}
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" onClick={copyMagicToken}>
           <CopyButton
@@ -67,12 +67,12 @@ export function UserDropdownContent() {
             content={account?.toMagicToken() || ''}
           />
           <span>Copy Magic Token</span>
-          <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+          {/* <DropdownMenuShortcut>⌘B</DropdownMenuShortcut> */}
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer" disabled>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
-          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+          {/* <DropdownMenuShortcut>⌘S</DropdownMenuShortcut> */}
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
@@ -90,7 +90,7 @@ export function UserDropdownContent() {
         <DropdownMenuItem className="cursor-pointer" disabled>
           <Plus className="mr-2 h-4 w-4" />
           <span>New Team</span>
-          <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
+          {/* <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut> */}
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
@@ -106,7 +106,7 @@ export function UserDropdownContent() {
       <DropdownMenuItem onSelect={signOut} className="cursor-pointer">
         <LogOut className="mr-2 h-4 w-4" />
         <span>Sign out</span>
-        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
       </DropdownMenuItem>
     </DropdownMenuContent>
   )

@@ -1,11 +1,11 @@
+import { PropsWithChildren } from 'react'
 import { Metadata } from 'next'
 import '@/styles/globals.css'
+import { Toaster } from '@/components/atoms/toaster'
 import GlobalDialog from '@/components/organisms/GlobalDialog'
 import VideoPlayer from '@com/templates/VideoPlayer'
 
 import Providers from './providers'
-import { PropsWithChildren } from 'react'
-import { Toaster } from '@/components/atoms/toaster'
 
 const websiteURL = process.env.NEXT_PUBLIC_WEBSITE_URL
 

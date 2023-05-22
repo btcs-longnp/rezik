@@ -1,10 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { IoPersonOutline } from 'react-icons/io5'
-import { useRecoilValue } from 'recoil'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { currentUserStore } from '@/stores/currentUser'
 import { isAnonymousUser } from '@/models/user/User'
 import { getAvatarString } from '@/services/utils/user'
 import Roll from '@com/organisms/Roll'
@@ -13,9 +11,11 @@ import { getForYouRooms } from '@/services/room/room'
 import HomeHeader from '@/components/templates/headers/HomeHeader'
 import { Avatar, AvatarFallback } from '@/components/atoms/avatar'
 import HomeHeaderForGuest from '@/components/templates/headers/HomeHeaderForGuest'
+import { useAuth } from '@/services/simpleAuth/useAuth'
+import { LoadingScreen } from '@/components/atoms/loading-skeleton'
 
 const Page = () => {
-  const currentUser = useRecoilValue(currentUserStore)
+  const { currentUser, isLoadingAuth } = useAuth()
   const [forYouRooms, setForYouRooms] = useState<Room[]>([])
 
   useEffect(() => {
@@ -25,6 +25,7 @@ const Page = () => {
 
   return (
     <>
+      {isLoadingAuth && <LoadingScreen />}
       <header className="fixed h-12 lg:h-14 top-0 left-0 px-2 lg:px-6 w-full bg-primary z-40">
         {isAnonymousUser(currentUser) ? (
           <HomeHeaderForGuest />
@@ -42,7 +43,7 @@ const Page = () => {
                   {isAnonymousUser(currentUser) ? (
                     <IoPersonOutline className="text-2xl" />
                   ) : (
-                    <div className="text-sm">
+                    <div className="text-2xl">
                       {getAvatarString(currentUser)}
                     </div>
                   )}
