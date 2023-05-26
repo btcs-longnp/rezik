@@ -26,7 +26,7 @@ const initialPos = {
   zIndex: 0,
 }
 
-const VideoPlayer = () => {
+function VideoPlayer() {
   const pathName = usePathname()
   const params = useParams()
   const searchParam = useSearchParams()
@@ -37,8 +37,7 @@ const VideoPlayer = () => {
   const resetPlaylist = useResetRecoilState(playlistStore)
   const playerRef = useRef<HTMLDivElement>(null)
   const [playerProps, playerCtrl] = useSpring(() => ({ from: initialPos }), [])
-  const shouldShowPlayer =
-    pathName?.startsWith('/r/') || pathName?.startsWith('/r-blue/')
+  const shouldShowPlayer = pathName?.startsWith('/r/')
   const roomId = shouldShowPlayer ? (params?.id as string) : undefined
   const isLivingRoom = pathName === `/r/${params?.id}`
   const isLightMode = !!searchParam.get('lightMode')
@@ -206,7 +205,7 @@ const VideoPlayer = () => {
   }, [resetCurSongReq, shouldShowPlayer, roomId, resetPlaylist])
 
   return (
-    <div className={`${!shouldShowPlayer ? 'hidden' : ''}`}>
+    <>
       <ReactionPool elementRef={playerRef} />
       <animated.div ref={playerRef} style={playerProps}>
         {curSongReq && (
@@ -226,7 +225,7 @@ const VideoPlayer = () => {
           />
         )}
       </animated.div>
-    </div>
+    </>
   )
 }
 
