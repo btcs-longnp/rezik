@@ -1,7 +1,7 @@
-import { FC, PropsWithChildren } from 'react'
+import { FC, MouseEvent, PropsWithChildren } from 'react'
 
 interface ControllerButtonProps {
-  onClick?: () => void
+  onClick?: (event: MouseEvent) => void
   disabled?: boolean
 }
 

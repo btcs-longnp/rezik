@@ -17,12 +17,13 @@ import { getAnonymousUser } from '@/models/user/User'
 import { playerEvent } from '@/models/eventEmitter/player'
 import { playlistStore } from '@/stores/playlist'
 import { curSongReqStore, isPlayingStore } from '@/stores/player'
+import { useToast } from '@/components/atoms/use-toast'
 
 import MusicController, {
   MusicControllerOptions,
 } from '../../organisms/MusicController'
+import { DraggableList } from '../../organisms/DraggableList'
 import SongCard from '../../organisms/SongCard'
-import { useToast } from '@/components/atoms/use-toast'
 
 const defaultSong = newSong(
   'IOe0tNoUGv8',
@@ -65,6 +66,8 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null)
   const params = useParams()
   const { toast } = useToast()
+  const [songCardHeight, setSongCardHeight] = useState(88)
+  const songCardRef = useRef<HTMLDivElement>(null)
 
   const roomId = (params?.id as string) || 'isling'
 
@@ -144,6 +147,21 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
   const handleMouseLeave = () => {
     isMouseEnterPlaylist.current = false
   }
+
+  const handleChangePlaylistOrder = async (orders: number[]) => {
+    const newList = orders.map((listIdx) => playlist.list[listIdx])
+    const theNewPlaylist = newPlaylist(newList, playlist.version)
+
+    await playlistRepo.setPlaylist(theNewPlaylist)
+  }
+
+  useEffect(() => {
+    if (!songCardRef.current) {
+      return
+    }
+
+    setSongCardHeight(songCardRef.current.clientHeight + 12)
+  }, [playlist.list.length])
 
   useEffect(() => {
     // do nothing if both playlist and playerState have not loaded
@@ -230,14 +248,16 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
       return
     }
 
+    const offsetTop =
+      songCardRef.getBoundingClientRect().top + scrollRef.current.scrollTop
+
     scrollRef.current.scrollTo({
       top: Math.max(
-        songCardRef.offsetTop -
+        offsetTop -
           scrollRef.current.offsetTop -
           topBarPlaceholderHeight -
-          8 -
           scrollRef.current.clientHeight / 2 +
-          1.5 * songCardRef.clientHeight,
+          0.5 * songCardRef.clientHeight,
         0
       ),
       behavior: 'smooth',
@@ -332,22 +352,31 @@ const PlaylistBox: FC<PlaylistBoxProps> = ({
         />
         <div
           ref={scrollRef}
-          className="overflow-y-auto space-y-2 lg:space-y-3"
+          className="overflow-y-auto space-y-2 lg:space-y-3 relative"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           <div className="h-1" id="top-bar-placeholder" />
-          {playlist.list.map((songReq) => (
-            <div className="px-2 lg:px-4" key={songReq.id}>
-              <SongCard
-                songRequest={songReq}
-                isCurSong={curSongReq?.id === songReq.id}
-                play={() => playBySongReqId(songReq.id)}
-                remove={() => removeSongRequest(songReq.id)}
-              />
-            </div>
-          ))}
-          <div className="h-[80px] lg:h-[80px]" />
+          <DraggableList<SongRequest>
+            list={playlist.list}
+            changeListOrder={handleChangePlaylistOrder}
+            getItemId={(item) => item.id}
+            renderItem={(item) => (
+              <div ref={songCardRef} className="px-2 lg:px-4">
+                <SongCard
+                  songRequest={item}
+                  isCurSong={curSongReq?.id === item.id}
+                  play={() => playBySongReqId(item.id)}
+                  remove={() => removeSongRequest(item.id)}
+                />
+              </div>
+            )}
+            itemHeight={songCardHeight}
+          />
+          <div
+            className="h-[88px] w-full absolute"
+            style={{ top: playlist.list.length * songCardHeight }}
+          />
         </div>
       </div>
       <div className="fixed lg:absolute bottom-0 w-full z-30 backdrop-blur-md">

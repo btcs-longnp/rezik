@@ -1,5 +1,5 @@
-import { FC, useEffect, useRef, useState } from 'react'
-import { IoPlay, IoTrash } from 'react-icons/io5'
+import { FC, MouseEvent, memo, useEffect, useRef, useState } from 'react'
+import { IoPlay, IoReorderTwo, IoTrash } from 'react-icons/io5'
 import Image from 'next/image'
 import SongRequest from '@/models/songRequest/SongRequest'
 import { truncateWithEllipsis } from '@/services/utils/string'
@@ -11,6 +11,7 @@ export interface SongCardProps {
   isCurSong: boolean
   play: () => void
   remove: () => void
+  className?: string
 }
 
 const SongCard: FC<SongCardProps> = ({
@@ -18,10 +19,16 @@ const SongCard: FC<SongCardProps> = ({
   isCurSong: isPlaying,
   play,
   remove,
+  className,
 }) => {
   const [songTitle, setSongTitle] = useState(songRequest.song.title)
   const songCardRef = useRef<HTMLDivElement>(null)
   const songTitleRef = useRef<HTMLDivElement>(null)
+
+  const preventDefault = (func: () => void) => (event: MouseEvent) => {
+    event.stopPropagation()
+    func()
+  }
 
   useEffect(() => {
     if (!songCardRef.current || !songTitleRef.current) {
@@ -40,9 +47,10 @@ const SongCard: FC<SongCardProps> = ({
     <div
       id={songRequest.id}
       ref={songCardRef}
-      className={`grid grid-cols-[auto_1fr] group rounded-md overflow-hidden hover:bg-white/30 ${
-        isPlaying ? 'bg-rose-400 bg-opacity-75' : ''
-      }`}
+      className={`grid grid-cols-[auto_1fr] group rounded-md overflow-hidden hover:bg-white/30 
+        ${isPlaying ? 'bg-rose-400 bg-opacity-75' : ''} 
+        ${className}
+      `}
     >
       <div className="w-28 h-20 relative overflow-hidden">
         <div className="absolute bottom-1 right-1 text-xs font-light bg-black/60 rounded-sm p-0.5 z-10">
@@ -72,13 +80,20 @@ const SongCard: FC<SongCardProps> = ({
           {songTitle}
         </div>
         <div className="hidden group-hover:block h-full">
-          <div className="flex items-center space-x-2 h-full">
-            <IconButton onClick={play}>
-              <IoPlay />
-            </IconButton>
-            <IconButton onClick={remove}>
-              <IoTrash />
-            </IconButton>
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2 h-full">
+              <IconButton onClick={preventDefault(play)}>
+                <IoPlay />
+              </IconButton>
+              <IconButton onClick={preventDefault(remove)}>
+                <IoTrash />
+              </IconButton>
+            </div>
+            <div className="mr-4">
+              <IconButton>
+                <IoReorderTwo />
+              </IconButton>
+            </div>
           </div>
         </div>
       </div>
@@ -86,4 +101,4 @@ const SongCard: FC<SongCardProps> = ({
   )
 }
 
-export default SongCard
+export default memo(SongCard)
